@@ -67,6 +67,16 @@ angular.module('ionicParseApp',
                         controller: 'RegisterController'
                     }
                 }
+            })
+
+            .state('app.car', {
+                url: '/car',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/carInfo.html',
+                        controller: 'CarController'
+                    }
+                }
             });
 
         $urlRouterProvider.otherwise('/welcome');
@@ -83,4 +93,3 @@ angular.module('ionicParseApp',
             $state.go('app.home');
         }
     });
-
