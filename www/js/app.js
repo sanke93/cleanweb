@@ -60,6 +60,15 @@ angular.module('ionicParseApp',
                 }
             })
 
+            .state('app.calculate', {
+                url: '/calculate',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/calculate.html',
+                        controller: 'CostCreationController'
+                    }
+                }
+            })
             .state('app.register', {
                 url: '/register',
                 views: {
