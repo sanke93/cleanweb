@@ -66,7 +66,7 @@ angular.module('ionicParseApp.controllers', [])
           mapOptions);
 
       //Marker + infowindow + angularjs compiled ng-click
-      
+
 
       $scope.map = map;
       var GeoMarker = new GeolocationMarker(map);
@@ -299,7 +299,7 @@ angular.module('ionicParseApp.controllers', [])
     $scope.removePayer = function(payerInstance, $index) {
         $scope.payerList.splice($index, 1);
     }
-    
+
     $scope.addPayer = function() {
         $scope.payerInstance = new venmoPayer();
         $scope.payerInstance.set('venmoUsername', $scope.data.venmoUsername)
@@ -346,6 +346,8 @@ angular.module('ionicParseApp.controllers', [])
     $scope.carData = {};
     $scope.carData.carYear = '';
     $scope.carData.carMake = '';
+    $scope.carData.carModel = '';
+    $scope.carData.carEngine = '';
 
     $scope.yearService = "Year Service: failed.";
     fuelecoAPIservice.getYears().success(function (response) {
@@ -353,11 +355,17 @@ angular.module('ionicParseApp.controllers', [])
         $scope.years = response.menuItem;
     });
 
+    $scope.listify = function(obj, value) {
+        if (obj == undefined)
+          return [value];
+        return value;
+    };
+
     $scope.updateMake = function() {
         $scope.makeService = "Make Service: failed."
         fuelecoAPIservice.getMakes($scope.carData.carYear.value).success(function (response) {
             $scope.makeService = "Make Service: succeeded."
-            $scope.makes = response.menuItem;
+            $scope.makes = $scope.listify(response.menuItem.length, response.menuItem);
         });
     };
 
@@ -365,7 +373,20 @@ angular.module('ionicParseApp.controllers', [])
         $scope.modelService = "Model Service: failed."
         fuelecoAPIservice.getModels($scope.carData.carYear.value, $scope.carData.carMake.value).success(function (response) {
             $scope.modelService = "Model Service: succeeded."
-            $scope.models = response.menuItem;
+            $scope.models = $scope.listify(response.menuItem.length, response.menuItem);
         });
+    };
+
+    $scope.updateEngine = function() {
+        scopetesting = $scope;
+        $scope.vehicleService = "Vehicle Service: failed."
+        fuelecoAPIservice.getVehicles($scope.carData.carYear.value, $scope.carData.carMake.value, $scope.carData.carModel.value).success(function (response) {
+            $scope.vehicleService = "Vehicle Service: succeeded."
+            $scope.vehicles = $scope.listify(response.menuItem.length, response.menuItem);
+        });
+    };
+
+    $scope.addCar = function() {
+        alert('Vehicle ID: ' + $scope.carData.carEngine.value);
     };
 });
