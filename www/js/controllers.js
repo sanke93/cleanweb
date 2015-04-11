@@ -42,14 +42,22 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('LoginController', function($scope, $state, $rootScope, $ionicLoading) {
+.controller('TripController', function($scope, $state, $rootScope) {
+
+    if (!$rootScope.isLoggedIn) {
+        $state.go('welcome');
+    }
+    
+})
+
+.controller('LoginController', function($scope, $state, $rootScope, $ionicLoading, $http) {
     $scope.user = {
         username: null,
         password: null
     };
 
     $scope.error = {};
-
+    $scope.name = "hi";
     $scope.login = function() {
         $scope.loading = $ionicLoading.show({
             content: 'Logging in',

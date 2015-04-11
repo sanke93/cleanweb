@@ -67,6 +67,16 @@ angular.module('ionicParseApp',
                         controller: 'RegisterController'
                     }
                 }
+            })
+
+            .state('app.addtrip', {
+                url: '/addtrip',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/addtrip.html',
+                        controller: 'TripController'
+                    }
+                }
             });
 
         $urlRouterProvider.otherwise('/welcome');
