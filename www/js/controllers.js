@@ -144,6 +144,14 @@ angular.module('ionicParseApp.controllers', [])
 
 })
 
+.controller('EndTripController', function($scope, $state, $rootScope) {
+
+    if (!$rootScope.isLoggedIn) {
+        $state.go('welcome');
+    }
+    scope_end = $scope;
+})
+
 .controller('LoginController', function($scope, $state, $rootScope, $ionicLoading, $http) {
     $scope.user = {
         username: null,
