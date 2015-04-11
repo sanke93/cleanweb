@@ -258,9 +258,27 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CostCreationController', function($scope, $state, $rootScope) {
     //TODO: cost calculation
+    blahblah = $scope;
+    $scope.data = {};
 
     console.log('tetst');
     $scope.rideCost = 10.00;
+    $scope.data.venmoUsername = 'check';
+    $scope.payerList = [];
+    var Trip = Parse.Object.extend('Trip');
+    var Cost = Parse.Object.extend('Cost');
+
+    var trip = new Trip()
+    trip.set('driver', $scope.user)
+    trip.save(null, {
+        success: function(trip) {
+            console.log('trip', trip);
+        }
+    })
+
+    $scope.addPayer = function() {
+        $scope.payerList.push($scope.data.venmoUsername);
+    }
 })
 
 .controller('MainController', function($scope, $state, $rootScope, $stateParams, $ionicHistory) {
