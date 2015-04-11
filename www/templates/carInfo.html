@@ -1,0 +1,45 @@
+<ion-view title="My Car">
+    <ion-content has-header="true" has-tabs="true" padding="true">
+        <div class="list">
+            <label class="item item-input item-select">
+              <div class="input-label">
+                Year
+              </div>
+              <select>
+                <option>2015</option>
+                <option selected>2014</option>
+                <option>2013</option>
+              </select>
+            </label>
+            <label class="item item-input item-select">
+              <div class="input-label">
+                Make
+              </div>
+              <select>
+                <option>Honda</option>
+                <option selected>Toyota</option>
+                <option>Ford</option>
+              </select>
+            </label>
+            <label class="item item-input item-select">
+              <div class="input-label">
+                Model
+              </div>
+              <select>
+                <option>Accord</option>
+                <option selected>Camry</option>
+                <option>Fiesta</option>
+              </select>
+            </label>
+            <label class="item item-input item-select">
+              <div class="input-label">
+                Color
+              </div>
+              <select ng-model="myColor" ng-options="color.name for color in colors">
+            </label>
+        </div>
+        <button class="button button-block button-balanced" ng-click="addCar()">
+            ADD MY CAR
+        </button>
+    </ion-content>
+</ion-view>

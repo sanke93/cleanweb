@@ -42,14 +42,22 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('LoginController', function($scope, $state, $rootScope, $ionicLoading) {
+.controller('TripController', function($scope, $state, $rootScope) {
+
+    if (!$rootScope.isLoggedIn) {
+        $state.go('welcome');
+    }
+    
+})
+
+.controller('LoginController', function($scope, $state, $rootScope, $ionicLoading, $http) {
     $scope.user = {
         username: null,
         password: null
     };
 
     $scope.error = {};
-
+    $scope.name = "hi";
     $scope.login = function() {
         $scope.loading = $ionicLoading.show({
             content: 'Logging in',
@@ -208,4 +216,38 @@ angular.module('ionicParseApp.controllers', [])
     $scope.toggleMenu = function() {
         $scope.sideMenuController.toggleRight();
     };
+})
+
+.controller('CarController', function($scope, $state, $ionicLoading) {
+    $scope.colors = [
+      {name:'black', shade:'dark'},
+      {name:'white', shade:'light', notAnOption: true},
+      {name:'red', shade:'dark'},
+      {name:'blue', shade:'dark', notAnOption: true},
+      {name:'yellow', shade:'light', notAnOption: false}
+    ];
+    $scope.driversList = [
+        {
+            Driver: {
+                givenName: 'Sebastian',
+                familyName: 'Vettel'
+            },
+            points: 322,
+            nationality: "German",
+            Constructors: [
+                {name: "Red Bull"}
+            ]
+        },
+        {
+            Driver: {
+            givenName: 'Fernando',
+                familyName: 'Alonso'
+            },
+            points: 207,
+            nationality: "Spanish",
+            Constructors: [
+                {name: "Ferrari"}
+            ]
+        }
+      ];
 });
