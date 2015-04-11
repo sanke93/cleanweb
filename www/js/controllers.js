@@ -53,23 +53,39 @@ angular.module('ionicParseApp.controllers', [])
     scope_trip = $scope;
     initialize = function () {
       //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
-      var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
+      $scope.startLocation = {}
+      $scope.loading1 = $ionicLoading.show({
+        content: 'Getting current location...',
+        //template: 'hi',
+        showBackdrop: true
+      });
+      navigator.geolocation.getCurrentPosition(function(pos) {
+
+        $scope.startLocation = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+        console.log("center", $scope.startLocation);
+
+        var mapOptions = {
+          streetViewControl:true,
+          center: $scope.startLocation,
+          zoom: 18,
+          streetViewControl: false,
+          panControl: false,
+          zoomControl: false,
+          mapTypeControl: false,
+        };
+        var map = new google.maps.Map(document.getElementById("map"),
+            mapOptions);
+
+        $scope.map = map;
+        GeoMarker = new GeolocationMarker(map);
+        $ionicLoading.hide();
+      }, function(error) {
+        alert('Unable to get location: ' + error.message);
+      });
+      //var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
       //var end = new google.maps.LatLng(55.8934378,-4.2201905);
-
-      var mapOptions = {
-        streetViewControl:true,
-        center: startLocation,
-        zoom: 18,
-        //mapTypeId: google.maps.MapTypeId.TERRAIN
-      };
-      var map = new google.maps.Map(document.getElementById("map"),
-          mapOptions);
-
-      //Marker + infowindow + angularjs compiled ng-click
       
-
-      $scope.map = map;
-      var GeoMarker = new GeolocationMarker(map);
+      
 
       // var directionsService = new google.maps.DirectionsService();
       // var directionsDisplay = new google.maps.DirectionsRenderer();
@@ -91,22 +107,48 @@ angular.module('ionicParseApp.controllers', [])
 
     google.maps.event.addDomListener(window, 'load', initialize());
 
-    $scope.centerOnMe = function() {
+
+    $scope.starttrip = function() {
+        //console.log("trip started", GeoMarker.position);
+        $scope.tripStarted = true;
         if(!$scope.map) {
           return;
         }
+        var infowindow = new google.maps.InfoWindow({
+              content: 'Start'
+          });
+
+        var marker = new google.maps.Marker({
+          position: $scope.startLocation,
+          map: $scope.map,
+          title: 'Trip'
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open($scope.map,marker);
+        });
 
         $scope.loading = $ionicLoading.show({
           content: 'Getting current location...',
-          template: 'hi',
+          //template: 'hi',
           showBackdrop: true
         });
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-          $scope.loading.hide();
-        }, function(error) {
-          alert('Unable to get location: ' + error.message);
-        });
+        // navigator.geolocation.getCurrentPosition(function(pos) {
+        //   $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+        //   $scope.loading.hide();
+        // }, function(error) {
+        //   alert('Unable to get location: ' + error.message);
+        // });
+        // $scope.watch('GeoMarker', function(val){
+        //     if(!(typeof val.position === 'undefined')){
+        //         $scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
+        //         $scope.loading.hide();
+        //     }
+        // });
+        //$scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
+        //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
+        
+        $scope.loading.hide();
+        
     };
 
     $scope.clickTest = function() {
