@@ -48,12 +48,13 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
+
     console.log("Hi", $scope.user.attributes.email);
     scope_trip = $scope;
     initialize = function () {
       var site = new google.maps.LatLng(55.9879314,-4.3042387);
       var hospital = new google.maps.LatLng(55.8934378,-4.2201905);
-    
+
       var mapOptions = {
         streetViewControl:true,
         center: site,
@@ -62,7 +63,7 @@ angular.module('ionicParseApp.controllers', [])
       };
       var map = new google.maps.Map(document.getElementById("map"),
           mapOptions);
-      
+
       //Marker + infowindow + angularjs compiled ng-click
       var contentString = "<div><a ng-click='clickTest()'>Click me!</a></div>";
       var compiled = $compile(contentString)($scope);
@@ -76,31 +77,31 @@ angular.module('ionicParseApp.controllers', [])
         map: map,
         title: 'Strathblane (Job Location)'
       });
-      
+
       var hospitalRoute = new google.maps.Marker({
         position: hospital,
         map: map,
         title: 'Hospital (Stobhill)'
       });
-      
+
       var infowindow = new google.maps.InfoWindow({
            content:"Project Location"
       });
 
       infowindow.open(map,marker);
-      
+
       var hospitalwindow = new google.maps.InfoWindow({
            content:"Nearest Hospital"
       });
 
       hospitalwindow.open(map,hospitalRoute);
-     
+
       google.maps.event.addListener(marker, 'click', function() {
         infowindow.open(map,marker);
       });
 
       $scope.map = map;
-      
+
       var directionsService = new google.maps.DirectionsService();
       var directionsDisplay = new google.maps.DirectionsRenderer();
 
@@ -115,10 +116,10 @@ angular.module('ionicParseApp.controllers', [])
           }
       });
 
-      directionsDisplay.setMap(map); 
+      directionsDisplay.setMap(map);
     }
-    
-  
+
+
     google.maps.event.addDomListener(window, 'load', initialize());
 
     $scope.centerOnMe = function() {
@@ -141,7 +142,6 @@ angular.module('ionicParseApp.controllers', [])
     $scope.clickTest = function() {
     alert('Example of infowindow with ng-click')
     };
-
 })
 
 .controller('EndTripController', function($scope, $state, $rootScope) {
@@ -288,7 +288,7 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CostCreationController', function($scope, $state, $rootScope) {
     //TODO: cost calculation
-    
+
     console.log('tetst');
     $scope.rideCost = 10.00;
 })
@@ -320,7 +320,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CarController', function($scope, $state, $ionicLoading) {
+.controller('CarController', function($scope, fuelecoAPIservice) {
     $scope.colors = [
       {name:'black', shade:'dark'},
       {name:'white', shade:'light', notAnOption: true},
@@ -328,28 +328,10 @@ angular.module('ionicParseApp.controllers', [])
       {name:'blue', shade:'dark', notAnOption: true},
       {name:'yellow', shade:'light', notAnOption: false}
     ];
-    $scope.driversList = [
-        {
-            Driver: {
-                givenName: 'Sebastian',
-                familyName: 'Vettel'
-            },
-            points: 322,
-            nationality: "German",
-            Constructors: [
-                {name: "Red Bull"}
-            ]
-        },
-        {
-            Driver: {
-            givenName: 'Fernando',
-                familyName: 'Alonso'
-            },
-            points: 207,
-            nationality: "Spanish",
-            Constructors: [
-                {name: "Ferrari"}
-            ]
-        }
-      ];
+
+    $scope.yearsList = [];
+    $scope.msg = "failed :(";
+    fuelecoAPIservice.getYears().success(function (response) {
+        $scope.msg = "succeeded! :D";
+    });
 });
