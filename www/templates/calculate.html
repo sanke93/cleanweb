@@ -14,7 +14,7 @@
                 </label>
             </div>
             <div class="col">
-                <button ng-click="addPayer()" class="button button-positive">Add</button>
+                <button ng-show="data.venmoUsername" ng-click="addPayer()" class="button button-positive">Add</button>
             </div>
         </div>
 
@@ -22,10 +22,23 @@
             <div class="col col-80">
                 <ul class="list">
                     <li class="item" ng-repeat="payer in payerList track by $index">
-                      test                    
+                        <div class="row">
+                            <div>
+                                {{payer.attributes.venmoUsername}}
+                            </div>
+                            <div class="col col-10 col-offset-90">
+                                <button class="button button-small button-assertive" ng-click="removePayer(payer, $index)">X</button>
+                            </div>           
+                        </div>
                   </li>
                 </ul>
             </div>
+        </div>
+
+        <div class="row">
+            <button class="button button-full button-balanced" ng-show="payerList.length" ng-click="createPayments()">
+                Charge
+            </button>
         </div>
     </ion-content>
 </ion-view>

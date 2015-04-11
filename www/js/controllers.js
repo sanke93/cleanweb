@@ -288,17 +288,19 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CostCreationController', function($scope, $state, $rootScope) {
     //TODO: cost calculation
+    var venmoPayer = Parse.Object.extend('venmoPayer')
     blahblah = $scope;
     $scope.data = {};
 
     console.log('tetst');
     $scope.rideCost = 10.00;
-    $scope.data.venmoUsername = 'check';
+    $scope.data.venmoUsername = '';
     $scope.payerList = [];
     var Trip = Parse.Object.extend('Trip');
     var Cost = Parse.Object.extend('Cost');
+    var CostComponent = Parse.Object.extend('CostComponent');
 
-    var trip = new Trip()
+    var trip = new Trip();
     trip.set('driver', $scope.user)
     trip.save(null, {
         success: function(trip) {
@@ -306,8 +308,40 @@ angular.module('ionicParseApp.controllers', [])
         }
     })
 
+    var cost = new Cost();
+    cost.set('trip', trip)
+    cost.save(null, {
+        success: function(trip) {
+            console.log('cost', cost);
+        }
+    })
+
+    var costcomponent = new CostComponent();
+    costcomponent.set('cost', cost)
+    costcomponent.set('amount', 10)
+    costcomponent.set('blurb', 'test')
+    costcomponent.save(null, {
+        success: function(trip) {
+            console.log('costcomponent', costcomponent);
+        }
+    })
+
+    $scope.removePayer = function(payerInstance, $index) {
+        $scope.payerList.splice($index, 1);
+    }
+    
     $scope.addPayer = function() {
-        $scope.payerList.push($scope.data.venmoUsername);
+        $scope.payerInstance = new venmoPayer();
+        $scope.payerInstance.set('venmoUsername', $scope.data.venmoUsername)
+        $scope.payerList.push($scope.payerInstance);
+    }
+
+    $scope.createPayments = function() {
+        var Payment = Parse.objects.extend('Payment')
+        var payment = new Payment();
+        payment.set('amount', $scope.rideCost/($scope.payerList.length + 1))
+        payment.set('cost', cost);
+        payment.set('')
     }
 })
 
