@@ -40,6 +40,7 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
+    scope_home = $scope;
 })
 
 .controller('TripController', function($scope, $state, $rootScope) {
@@ -47,7 +48,8 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
-    
+    scope_trip = $scope;
+
 })
 
 .controller('LoginController', function($scope, $state, $rootScope, $ionicLoading, $http) {
