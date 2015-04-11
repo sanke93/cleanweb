@@ -300,17 +300,19 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CostCreationController', function($scope, $state, $rootScope) {
     //TODO: cost calculation
+    var venmoPayer = Parse.Object.extend('venmoPayer')
     blahblah = $scope;
     $scope.data = {};
 
     console.log('tetst');
     $scope.rideCost = 10.00;
-    $scope.data.venmoUsername = 'check';
+    $scope.data.venmoUsername = '';
     $scope.payerList = [];
     var Trip = Parse.Object.extend('Trip');
     var Cost = Parse.Object.extend('Cost');
+    var CostComponent = Parse.Object.extend('CostComponent');
 
-    var trip = new Trip()
+    var trip = new Trip();
     trip.set('driver', $scope.user)
     trip.save(null, {
         success: function(trip) {
@@ -318,8 +320,40 @@ angular.module('ionicParseApp.controllers', [])
         }
     })
 
+    var cost = new Cost();
+    cost.set('trip', trip)
+    cost.save(null, {
+        success: function(trip) {
+            console.log('cost', cost);
+        }
+    })
+
+    var costcomponent = new CostComponent();
+    costcomponent.set('cost', cost)
+    costcomponent.set('amount', 10)
+    costcomponent.set('blurb', 'test')
+    costcomponent.save(null, {
+        success: function(trip) {
+            console.log('costcomponent', costcomponent);
+        }
+    })
+
+    $scope.removePayer = function(payerInstance, $index) {
+        $scope.payerList.splice($index, 1);
+    }
+    
     $scope.addPayer = function() {
-        $scope.payerList.push($scope.data.venmoUsername);
+        $scope.payerInstance = new venmoPayer();
+        $scope.payerInstance.set('venmoUsername', $scope.data.venmoUsername)
+        $scope.payerList.push($scope.payerInstance);
+    }
+
+    $scope.createPayments = function() {
+        var Payment = Parse.objects.extend('Payment')
+        var payment = new Payment();
+        payment.set('amount', $scope.rideCost/($scope.payerList.length + 1))
+        payment.set('cost', cost);
+        payment.set('')
     }
 })
 
@@ -351,17 +385,29 @@ angular.module('ionicParseApp.controllers', [])
 })
 
 .controller('CarController', function($scope, fuelecoAPIservice) {
-    $scope.colors = [
-      {name:'black', shade:'dark'},
-      {name:'white', shade:'light', notAnOption: true},
-      {name:'red', shade:'dark'},
-      {name:'blue', shade:'dark', notAnOption: true},
-      {name:'yellow', shade:'light', notAnOption: false}
-    ];
+    $scope.carData = {};
+    $scope.carData.carYear = '';
+    $scope.carData.carMake = '';
 
-    $scope.yearsList = [];
-    $scope.msg = "failed :(";
+    $scope.yearService = "Year Service: failed.";
     fuelecoAPIservice.getYears().success(function (response) {
-        $scope.msg = "succeeded! :D";
+        $scope.yearService = "Year Service: succeeded.";
+        $scope.years = response.menuItem;
     });
+
+    $scope.updateMake = function() {
+        $scope.makeService = "Make Service: failed."
+        fuelecoAPIservice.getMakes($scope.carData.carYear.value).success(function (response) {
+            $scope.makeService = "Make Service: succeeded."
+            $scope.makes = response.menuItem;
+        });
+    };
+
+    $scope.updateModel = function() {
+        $scope.modelService = "Model Service: failed."
+        fuelecoAPIservice.getModels($scope.carData.carYear.value, $scope.carData.carMake.value).success(function (response) {
+            $scope.modelService = "Model Service: succeeded."
+            $scope.models = response.menuItem;
+        });
+    };
 });

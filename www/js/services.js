@@ -5,15 +5,22 @@ angular.module('ionicParseApp.services', [])
     var fuelecoAPI = {};
 
     fuelecoAPI.getYears = function() {
-
-      data= $http({
+      return $http({
         method: 'GET',
-        //url: 'http://ergast.com/api/f1/2013/driverStandings.json?callback=JSON_CALLBACK'
-        //url: 'http://rest-service.guides.spring.io/greeting'
         url: 'http://www.fueleconomy.gov/ws/rest/vehicle/menu/year'
       });
-      console.log(data)
-      return data;
+    },
+    fuelecoAPI.getMakes = function(year) {
+      return $http({
+        method: 'GET',
+        url: 'http://www.fueleconomy.gov/ws/rest/vehicle/menu/make?year=' + year
+      });
+    },
+    fuelecoAPI.getModels = function(year, make) {
+      return $http({
+        method: 'GET',
+        url: 'http://www.fueleconomy.gov/ws/rest/vehicle/menu/model?year=' + year + '&make=' + make
+      });
     }
 
     return fuelecoAPI;

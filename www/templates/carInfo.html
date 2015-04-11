@@ -1,42 +1,28 @@
 <ion-view title="My Car">
     <ion-content has-header="true" has-tabs="true" padding="true">
         <div class="list">
-            {{msg}}
+            {{yearService}}
+            {{makeService}}
+            {{modelService}}
             <label class="item item-input item-select">
               <div class="input-label">
                 Year
               </div>
-              <select>
-                <option>2015</option>
-                <option selected>2014</option>
-                <option>2013</option>
-              </select>
-            </label>
-            <label class="item item-input item-select">
-              <div class="input-label">
-                Color
-              </div>
-              <select ng-model="myColor" ng-options="color.name for color in colors">
+              <select ng-model="carData.carYear" ng-options="year.value for year in years" ng-change="updateMake()">
               </select>
             </label>
             <label class="item item-input item-select">
               <div class="input-label">
                 Make
               </div>
-              <select>
-                <option>Honda</option>
-                <option selected>Toyota</option>
-                <option>Ford</option>
+              <select ng-model="carData.carMake" ng-options="make.value for make in makes" ng-change="updateModel()">
               </select>
             </label>
             <label class="item item-input item-select">
               <div class="input-label">
                 Model
               </div>
-              <select>
-                <option>Accord</option>
-                <option selected>Camry</option>
-                <option>Fiesta</option>
+              <select ng-model="carData.carModel" ng-options="model.value for model in models" ng-change="updateInfo()">
               </select>
             </label>
         </div>
