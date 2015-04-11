@@ -111,9 +111,22 @@ angular.module('ionicParseApp.controllers', [])
     $scope.starttrip = function() {
         //console.log("trip started", GeoMarker.position);
         $scope.tripStarted = true;
+        var Trip = Parse.Object.extend('Trip');
         if(!$scope.map) {
           return;
         }
+
+        var trip = new Trip();
+        trip.set('driver', $scope.user);
+       // trip.set('startPoint', ($scope.tripStarted.k, $scope.tripStarted.D));
+
+        trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
+        //trip.set('startPoint', (12,32));
+        trip.save(null, {
+            success: function(trip) {
+                console.log('trip', trip);
+            }
+        })
         var infowindow = new google.maps.InfoWindow({
               content: 'Start'
           });
@@ -151,9 +164,9 @@ angular.module('ionicParseApp.controllers', [])
         
     };
 
-    $scope.clickTest = function() {
-    alert('Example of infowindow with ng-click')
-    };
+    // $scope.clickTest = function() {
+    // alert('Example of infowindow with ng-click')
+    // };
 })
 
 .controller('EndTripController', function($scope, $state, $rootScope) {
