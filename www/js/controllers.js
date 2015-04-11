@@ -47,7 +47,7 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
-    
+
 })
 
 .controller('LoginController', function($scope, $state, $rootScope, $ionicLoading, $http) {
@@ -211,7 +211,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CarController', function($scope, $state, $ionicLoading) {
+.controller('CarController', function($scope, fuelecoAPIservice) {
     $scope.colors = [
       {name:'black', shade:'dark'},
       {name:'white', shade:'light', notAnOption: true},
@@ -219,28 +219,11 @@ angular.module('ionicParseApp.controllers', [])
       {name:'blue', shade:'dark', notAnOption: true},
       {name:'yellow', shade:'light', notAnOption: false}
     ];
-    $scope.driversList = [
-        {
-            Driver: {
-                givenName: 'Sebastian',
-                familyName: 'Vettel'
-            },
-            points: 322,
-            nationality: "German",
-            Constructors: [
-                {name: "Red Bull"}
-            ]
-        },
-        {
-            Driver: {
-            givenName: 'Fernando',
-                familyName: 'Alonso'
-            },
-            points: 207,
-            nationality: "Spanish",
-            Constructors: [
-                {name: "Ferrari"}
-            ]
-        }
-      ];
+
+    $scope.yearsList = [];
+    $scope.msg = "failed :(";
+    fuelecoAPIservice.getYears().success(function (response) {
+        $scope.msg = "succeeded! :D";
+    });
+
 });
