@@ -313,17 +313,29 @@ angular.module('ionicParseApp.controllers', [])
 })
 
 .controller('CarController', function($scope, fuelecoAPIservice) {
-    $scope.colors = [
-      {name:'black', shade:'dark'},
-      {name:'white', shade:'light', notAnOption: true},
-      {name:'red', shade:'dark'},
-      {name:'blue', shade:'dark', notAnOption: true},
-      {name:'yellow', shade:'light', notAnOption: false}
-    ];
+    $scope.carData = {};
+    $scope.carData.carYear = '';
+    $scope.carData.carMake = '';
 
-    $scope.yearsList = [];
-    $scope.msg = "failed :(";
+    $scope.yearService = "Year Service: failed.";
     fuelecoAPIservice.getYears().success(function (response) {
-        $scope.msg = "succeeded! :D";
+        $scope.yearService = "Year Service: succeeded.";
+        $scope.years = response.menuItem;
     });
+
+    $scope.updateMake = function() {
+        $scope.makeService = "Make Service: failed."
+        fuelecoAPIservice.getMakes($scope.carData.carYear.value).success(function (response) {
+            $scope.makeService = "Make Service: succeeded."
+            $scope.makes = response.menuItem;
+        });
+    };
+
+    $scope.updateModel = function() {
+        $scope.modelService = "Model Service: failed."
+        fuelecoAPIservice.getModels($scope.carData.carYear.value, $scope.carData.carMake.value).success(function (response) {
+            $scope.modelService = "Model Service: succeeded."
+            $scope.models = response.menuItem;
+        });
+    };
 });
