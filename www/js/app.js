@@ -98,6 +98,16 @@ angular.module('ionicParseApp',
                         controller: 'TripController'
                     }
                 }
+            })
+
+            .state('app.endtrip', {
+                url: '/endtrip',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/endtrip.html',
+                        controller: 'EndTripController'
+                    }
+                }
             });
 
         $urlRouterProvider.otherwise('/welcome');
