@@ -176,6 +176,13 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
+.controller('CostCreationController', function($scope, $state, $rootScope) {
+    //TODO: cost calculation
+    
+    console.log('tetst');
+    $scope.rideCost = 10.00;
+})
+
 .controller('MainController', function($scope, $state, $rootScope, $stateParams, $ionicHistory) {
     if ($stateParams.clear) {
         $ionicHistory.clearHistory();
