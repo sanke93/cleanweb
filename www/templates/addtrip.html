@@ -4,9 +4,10 @@
         <!-- {{user.attributes.email}} -->
         <div id="map" data-tap-disabled="true"></div>
         <ion-footer-bar class="bar-dark"  align-title="center">
-        <div class="title">
+        <div class="title" ng-cloak>
               <a ng-click="starttrip()" class="button button-icon icon ion-navigate" ng-hide="tripStarted">Start Trip</a>
-              <a ng-click="endtrip()" ui-sref="app.endtrip" class="button button-icon icon ion-navigate" ng-show="tripStarted">End Trip</a>
+              <a ng-click="endtrip()" class="button button-icon icon ion-navigate" ng-show="tripStarted">End Trip</a>
+             <!--  <a ng-click="endtrip()" ui-sref="app.endtrip" class="button button-icon icon ion-navigate" ng-show="tripStarted">End Trip</a> -->
               </div>
             </ion-footer-bar>
     </ion-content>
