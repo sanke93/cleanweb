@@ -76,6 +76,17 @@ angular.module('ionicParseApp',
                         templateUrl: 'templates/carInfo.html',
                         controller: 'CarController'
                     }
+
+                }
+            })
+
+            .state('app.addtrip', {
+                url: '/addtrip',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/addtrip.html',
+                        controller: 'TripController'
+                    }
                 }
             });
 
