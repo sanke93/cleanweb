@@ -4,25 +4,33 @@
             {{yearService}}
             {{makeService}}
             {{modelService}}
+            {{vehicleService}}
             <label class="item item-input item-select">
               <div class="input-label">
                 Year
               </div>
-              <select ng-model="carData.carYear" ng-options="year.value for year in years" ng-change="updateMake()">
+              <select ng-model="carData.carYear" ng-options="year.text for year in years" ng-change="updateMake()">
               </select>
             </label>
             <label class="item item-input item-select">
               <div class="input-label">
                 Make
               </div>
-              <select ng-model="carData.carMake" ng-options="make.value for make in makes" ng-change="updateModel()">
+              <select ng-model="carData.carMake" ng-options="make.text for make in makes" ng-change="updateModel()">
               </select>
             </label>
             <label class="item item-input item-select">
               <div class="input-label">
                 Model
               </div>
-              <select ng-model="carData.carModel" ng-options="model.value for model in models" ng-change="updateInfo()">
+              <select ng-model="carData.carModel" ng-options="model.text for model in models" ng-change="updateEngine()">
+              </select>
+            </label>
+            <label class="item item-input item-select">
+              <div class="input-label">
+                Engine
+              </div>
+              <select ng-model="carData.carEngine" ng-options="engine.text for engine in vehicles">
               </select>
             </label>
         </div>

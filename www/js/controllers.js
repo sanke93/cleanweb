@@ -84,8 +84,21 @@ angular.module('ionicParseApp.controllers', [])
       });
       //var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
       //var end = new google.maps.LatLng(55.8934378,-4.2201905);
-      
-      
+
+      var mapOptions = {
+        streetViewControl:true,
+        center: startLocation,
+        zoom: 18,
+        //mapTypeId: google.maps.MapTypeId.TERRAIN
+      };
+      var map = new google.maps.Map(document.getElementById("map"),
+          mapOptions);
+
+      //Marker + infowindow + angularjs compiled ng-click
+
+
+      $scope.map = map;
+      var GeoMarker = new GeolocationMarker(map);
 
       // var directionsService = new google.maps.DirectionsService();
       // var directionsDisplay = new google.maps.DirectionsRenderer();
@@ -160,9 +173,15 @@ angular.module('ionicParseApp.controllers', [])
         // });
         //$scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
         //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
+<<<<<<< HEAD
         
         $ionicLoading.hide();
         
+=======
+
+        $scope.loading.hide();
+
+>>>>>>> bac39ba992968ead3700fac65d239c610a26bf08
     };
 
     $scope.endtrip = function(){
@@ -381,7 +400,7 @@ angular.module('ionicParseApp.controllers', [])
     $scope.removePayer = function(payerInstance, $index) {
         $scope.payerList.splice($index, 1);
     }
-    
+
     $scope.addPayer = function() {
         $scope.payerInstance = new venmoPayer();
         $scope.payerInstance.set('venmoUsername', $scope.data.venmoUsername)
@@ -428,6 +447,8 @@ angular.module('ionicParseApp.controllers', [])
     $scope.carData = {};
     $scope.carData.carYear = '';
     $scope.carData.carMake = '';
+    $scope.carData.carModel = '';
+    $scope.carData.carEngine = '';
 
     $scope.yearService = "Year Service: failed.";
     fuelecoAPIservice.getYears().success(function (response) {
@@ -435,11 +456,17 @@ angular.module('ionicParseApp.controllers', [])
         $scope.years = response.menuItem;
     });
 
+    $scope.listify = function(obj, value) {
+        if (obj == undefined)
+          return [value];
+        return value;
+    };
+
     $scope.updateMake = function() {
         $scope.makeService = "Make Service: failed."
         fuelecoAPIservice.getMakes($scope.carData.carYear.value).success(function (response) {
             $scope.makeService = "Make Service: succeeded."
-            $scope.makes = response.menuItem;
+            $scope.makes = $scope.listify(response.menuItem.length, response.menuItem);
         });
     };
 
@@ -447,7 +474,20 @@ angular.module('ionicParseApp.controllers', [])
         $scope.modelService = "Model Service: failed."
         fuelecoAPIservice.getModels($scope.carData.carYear.value, $scope.carData.carMake.value).success(function (response) {
             $scope.modelService = "Model Service: succeeded."
-            $scope.models = response.menuItem;
+            $scope.models = $scope.listify(response.menuItem.length, response.menuItem);
         });
+    };
+
+    $scope.updateEngine = function() {
+        scopetesting = $scope;
+        $scope.vehicleService = "Vehicle Service: failed."
+        fuelecoAPIservice.getVehicles($scope.carData.carYear.value, $scope.carData.carMake.value, $scope.carData.carModel.value).success(function (response) {
+            $scope.vehicleService = "Vehicle Service: succeeded."
+            $scope.vehicles = $scope.listify(response.menuItem.length, response.menuItem);
+        });
+    };
+
+    $scope.addCar = function() {
+        alert('Vehicle ID: ' + $scope.carData.carEngine.value);
     };
 });
