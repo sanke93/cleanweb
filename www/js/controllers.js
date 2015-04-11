@@ -85,20 +85,6 @@ angular.module('ionicParseApp.controllers', [])
       //var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
       //var end = new google.maps.LatLng(55.8934378,-4.2201905);
 
-      var mapOptions = {
-        streetViewControl:true,
-        center: startLocation,
-        zoom: 18,
-        //mapTypeId: google.maps.MapTypeId.TERRAIN
-      };
-      var map = new google.maps.Map(document.getElementById("map"),
-          mapOptions);
-
-      //Marker + infowindow + angularjs compiled ng-click
-
-
-      $scope.map = map;
-      var GeoMarker = new GeolocationMarker(map);
 
       // var directionsService = new google.maps.DirectionsService();
       // var directionsDisplay = new google.maps.DirectionsRenderer();
@@ -173,15 +159,9 @@ angular.module('ionicParseApp.controllers', [])
         // });
         //$scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
         //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
-<<<<<<< HEAD
         
         $ionicLoading.hide();
         
-=======
-
-        $scope.loading.hide();
-
->>>>>>> bac39ba992968ead3700fac65d239c610a26bf08
     };
 
     $scope.endtrip = function(){
