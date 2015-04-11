@@ -1,5 +1,10 @@
-<ion-view title="Add a trip" right-buttons="rightButtons">
+<ion-view title="Add a trip" right-buttons="rightButtons" hide-back-button="true">
+
     <ion-content has-header="true" has-tabs="true" padding="true">
-        {{user.attributes.email}}
+        <!-- {{user.attributes.email}} -->
+        <div id="map" data-tap-disabled="true"></div>
+        <ion-footer-bar class="bar-dark">
+              <a ng-click="centerOnMe()" ui-sref="app.endtrip" class="button button-icon icon ion-navigate">Start</a>
+            </ion-footer-bar>
     </ion-content>
 </ion-view>

@@ -4,8 +4,9 @@
 // 'ionicParseApp' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'ionicParseApp.controllers' is found in controllers.js
+// 'ionicParseApp.services' is found in services.js
 angular.module('ionicParseApp',
-        [ 'ionic', 'ionicParseApp.controllers' ]
+        [ 'ionic', 'ionicParseApp.controllers', 'ionicParseApp.services' ]
     )
     .config(function($stateProvider, $urlRouterProvider) {
 
@@ -95,6 +96,16 @@ angular.module('ionicParseApp',
                     'menuContent': {
                         templateUrl: 'templates/addtrip.html',
                         controller: 'TripController'
+                    }
+                }
+            })
+
+            .state('app.endtrip', {
+                url: '/endtrip',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/endtrip.html',
+                        controller: 'EndTripController'
                     }
                 }
             });
