@@ -78,7 +78,16 @@ angular.module('ionicParseApp.controllers', [])
     }
 
     $scope.venmoRedirect = function() {
-        window.location = venmoAPIFactory.getUrl();
+        console.log('test')
+        var ref = window.open(venmoAPIFactory.getUrl())
+        ref.addEventListener('loadstart', function(event) { 
+            if((event.url).startsWith("http://localhost:8100")) {
+                var string = "?access_token="
+                var accessToken = event.url.split(string)[1].split("#")[0];
+                venmoAPIFactory.setAccessToken(accessToken);
+                ref.close();
+            }
+        })
     }
 
     $scope.checkAuth = function() {

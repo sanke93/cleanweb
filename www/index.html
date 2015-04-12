@@ -18,6 +18,13 @@
     <!-- client-side libraries -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
     <script src="lib/parse/parse.min.js"></script>
+    <script>
+        if (typeof String.prototype.startsWith != 'function') {
+            String.prototype.startsWith = function (str){
+                return this.indexOf(str) == 0;
+            };
+        }
+    </script>
 
 
     <!-- cordova script (this will be a 404 during development) -->
