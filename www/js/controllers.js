@@ -20,7 +20,7 @@ angular.module('ionicParseApp.controllers', [])
 .controller('WelcomeController', function($scope, $state, $rootScope, $ionicHistory, $stateParams) {
 
     $rootScope.hasCar = false;
-    
+
     if ($stateParams.clear) {
         $ionicHistory.clearHistory();
         $ionicHistory.clearCache();
@@ -66,10 +66,22 @@ angular.module('ionicParseApp.controllers', [])
         $state.go('welcome');
     }
 
+    $scope.selectcar = function() {
+      var showPopup = $ionicPopup.show({
+        scope: $scope,
+        title: 'Select Car',
+        templateUrl: '/templates/selectcar.html'
+      });
+      showPopup.then(function(res) {
+        console.log('Thank you for not eating my delicious ice cream cone');
+      });
+    }
+
     console.log("Hi", $scope.user.attributes.email);
     scope_trip = $scope;
     dist_track = distanceTracker;
     initialize = function () {
+      $scope.selectcar();
       //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
       $scope.startLocation = {}
       $scope.loading1 = $ionicLoading.show({
@@ -124,9 +136,9 @@ angular.module('ionicParseApp.controllers', [])
 
     google.maps.event.addDomListener(window, 'load', initialize());
 
-
     $scope.starttrip = function() {
         //console.log("trip started", GeoMarker.position);
+        $scope.selectcar();
         $scope.tripStarted = true;
         var Trip = Parse.Object.extend('Trip');
         if(!$scope.map) {
@@ -450,6 +462,30 @@ angular.module('ionicParseApp.controllers', [])
 
     $scope.toggleMenu = function() {
         $scope.sideMenuController.toggleRight();
+    };
+})
+
+.controller('SelectCarController', function($scope) {
+
+    $scope.userCars = {};
+
+    var Car = Parse.Object.extend('Car');
+    var query = new Parse.Query(Car);
+    query.equalTo("user", Parse.User.current());
+    query.descending("avgMPG");
+    query.find({
+      success: function(results) {
+        $scope.cars = results;
+      },
+      error: function(error) {
+        alert("Error: " + error.code + " " + error.message);
+      }
+    });
+
+    $scope.updateCarStats = function() {
+        $scope.carInfo = $scope.userCars.car.attributes;
+        console.log($scope.carInfo);
+        console.log($scope.carInfo.make);
     };
 })
 
