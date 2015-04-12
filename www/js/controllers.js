@@ -90,7 +90,6 @@ angular.module('ionicParseApp.controllers', [])
             }
         })
         ref.addEventListener('exit', function(event) {
-
                 window.reload();
             }
         )
@@ -250,6 +249,7 @@ angular.module('ionicParseApp.controllers', [])
         //update Trip
         $scope.currentTrip.set('endPoint', new Parse.GeoPoint({latitude: $scope.geoMarker.position.k, longitude: $scope.geoMarker.position.D}));
         $scope.currentTrip.set('endedAt', new Date());
+        $scope.currentTrip.set('totalDist', parseInt((distanceTracker.getDistance()).toFixed(2)));
         //trip.set('startPoint', (12,32));
         $scope.currentTrip.save(null, {
             success: function(tripSaved) {
@@ -406,7 +406,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CostCreationController', function($scope, $state, $rootScope, venmoAPIFactory) {
+.controller('CostCreationController', function($scope, $state, $rootScope, venmoAPIFactory, fuelecoAPIservice, current) {
     //TODO: cost calculation
     $scope.venmo = venmoAPIFactory;
     if (venmoAPIFactory.isAuthenticated)
@@ -423,39 +423,63 @@ angular.module('ionicParseApp.controllers', [])
     })
     scope_cost = $scope;
     $scope.data = {};
-
-    $scope.rideCost = 10.00;
+    $scope.totalPrice = 'Calculating price....'
     $scope.data.venmoUsername = '';
     $scope.payerList = [];
     var Trip = Parse.Object.extend('Trip');
     var Cost = Parse.Object.extend('Cost');
     var CostComponent = Parse.Object.extend('CostComponent');
-
-    var trip = new Trip();
-    trip.set('driver', $scope.user)
-    trip.save(null, {
-        success: function(trip) {
-            console.log('trip', trip);
+    var Car = Parse.Object.extend('Car');
+    // var tripQuery = new Parse.Query(Trip);
+    // tripQuery.exists("totalDist");
+    // tripQuery.descending("updatedAt");
+    $scope.trip = current.tripGet();
+        
+            
+    console.log('trip', $scope.trip);
+    var totalDist = $scope.trip.get("totalDist");
+    var carId = $scope.trip.get("car").id;
+    var carQuery = new Parse.Query(Car);
+    carQuery.get(carId, {
+        success: function(car) {
+            $scope.car = car;
+             avgMPG = parseFloat($scope.car.get('avgMPG'))
+             totalGallons = totalDist/avgMPG;
+             gasType = $scope.car.get("gasType");
+            fuelecoAPIservice.getFuelPrices().success(function(response) {
+                console.log('response', response);
+                $scope.fuelPrices = response;
+                var thisCarFuelPrice = $scope.fuelPrices[gasType];
+                var totalPriceNum = totalGallons * thisCarFuelPrice;
+                totalPriceNum = Math.round(totalPriceNum * 100) / 100
+                $scope.totalPrice = totalPriceNum.toString();
+            })
         }
     })
+            
+        
+    
 
     var cost = new Cost();
-    cost.set('trip', trip)
+    cost.set('trip', $scope.trip)
     cost.save(null, {
-        success: function(trip) {
+        success: function(cost) {
             console.log('cost', cost);
+            $scope.cost = cost;
         }
     })
 
-    var costcomponent = new CostComponent();
-    costcomponent.set('cost', cost)
-    costcomponent.set('amount', 10)
-    costcomponent.set('blurb', 'test')
-    costcomponent.save(null, {
-        success: function(trip) {
-            console.log('costcomponent', costcomponent);
-        }
-    })
+
+
+    // var costcomponent = new CostComponent();
+    // costcomponent.set('cost', cost)
+    // costcomponent.set('amount', )
+    // costcomponent.set('blurb', 'test')
+    // costcomponent.save(null, {
+    //     success: function(trip) {
+    //         console.log('costcomponent', costcomponent);
+    //     }
+    // })
 
     $scope.removePayer = function(payerInstance, $index) {
         $scope.payerList.splice($index, 1);
@@ -675,6 +699,19 @@ angular.module('ionicParseApp.controllers', [])
             var Car = Parse.Object.extend('Car');
             var car = new Car();
 
+            fuelecoAPIservice.getVehicleMPG($scope.carData.carEngine.value).success(function (response) {
+                console.log("Vehicle MPG Service: succeeded.");
+                $scope.avgMPG = response.avgMpg;
+            });
+
+            fuelecoAPIservice.getVehicleInfo($scope.carData.carEngine.value).success(function (response) {
+                console.log("Vehicle Info Service: succeeded.");
+                $scope.gasType = response.fuelType1.split(' Gasoline')[0].toLowerCase();
+                if ($scope.avgMPG == undefined)
+                {
+                  $scope.avgMPG = (parseFloat(response.UCity) + parseFloat(response.UHighway))/2.0;
+                  }
+            });
             car.set('user', $scope.user);
             car.set('dbId', $scope.carData.carEngine.value);
             car.set('avgMPG', $scope.avgMPG.toString());
@@ -694,6 +731,7 @@ angular.module('ionicParseApp.controllers', [])
                       $scope.findCars();
                       console.log('popup closed');
                     });
+
                 }
             });
       }
