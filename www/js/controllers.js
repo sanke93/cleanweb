@@ -43,7 +43,7 @@ angular.module('ionicParseApp.controllers', [])
     scope_home = $scope;
 })
 
-.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading) {
+.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup) {
 
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
@@ -51,6 +51,7 @@ angular.module('ionicParseApp.controllers', [])
 
     console.log("Hi", $scope.user.attributes.email);
     scope_trip = $scope;
+    dist_track = distanceTracker;
     initialize = function () {
       //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
       $scope.startLocation = {}
@@ -159,13 +160,23 @@ angular.module('ionicParseApp.controllers', [])
         // });
         //$scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
         //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
-        
+        distanceTracker.startWatcher()
         $ionicLoading.hide();
         
     };
 
     $scope.endtrip = function(){
         console.log("end", $scope.geoMarker);
+        distanceTracker.stopWatcher()
+           var alertPopup = $ionicPopup.alert({
+             title: 'Trip Details',
+             template: 'Total Distance: '+ distanceTracker.getDistance(),
+           });
+           alertPopup.then(function(res) {
+             console.log('Thank you for not eating my delicious ice cream cone');
+           });
+        
+        
         var infowindow = new google.maps.InfoWindow({
               content: 'End Trip'
           });
@@ -184,10 +195,12 @@ angular.module('ionicParseApp.controllers', [])
         //trip.set('startPoint', (12,32));
         $scope.currentTrip.save(null, {
             success: function(trip) {
-                console.log('trip', trip);
+                console.log('trip', trip.attributes.endpoint);
                 $scope.currentTrip = trip
             }
         })
+
+
     }
 
     // $scope.clickTest = function() {
