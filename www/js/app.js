@@ -6,9 +6,9 @@
 // 'ionicParseApp.controllers' is found in controllers.js
 // 'ionicParseApp.services' is found in services.js
 angular.module('ionicParseApp',
-        [ 'ionic', 'ionicParseApp.controllers', 'ionicParseApp.services', 'ngRoute' ]
+        [ 'ionic', 'ionicParseApp.controllers', 'ionicParseApp.services' ]
     )
-    .config(function($stateProvider, $urlRouterProvider, $routeProvider) {
+    .config(function($stateProvider, $urlRouterProvider) {
 
         // Ionic uses AngularUI Router which uses the concept of states
         // Learn more here: https://github.com/angular-ui/ui-router

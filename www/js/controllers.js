@@ -39,7 +39,7 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('HomeController', function($scope, $routeParams, $state, $rootScope, $window, venmoAPIFactory, $location) {
+.controller('HomeController', function($scope, $state, $rootScope, $window, venmoAPIFactory, $location) {
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
