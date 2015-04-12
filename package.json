@@ -16,7 +16,8 @@
     "shelljs": "^0.3.0"
   },
   "cordovaPlugins": [
-    "https://github.com/apache/cordova-plugin-geolocation.git"
+    "https://github.com/apache/cordova-plugin-geolocation.git",
+    "https://git-wip-us.apache.org/repos/asf/cordova-plugin-inappbrowser.git"
   ],
   "cordovaPlatforms": [
     "ios"
