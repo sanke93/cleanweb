@@ -35,3 +35,16 @@
 .welcome{
   padding-top: 100px;
 }
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none !important;
+}
+
+#end-trip{
+  visibility: hidden;
+
+}
+
+#start-trip{
+
+  position: absolute;
+}

@@ -93,7 +93,7 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
-
+    $scope.tripControl = 'Start Trip';
     $scope.selectcar = function() {
       $rootScope.showCarPopup = $ionicPopup.show({
         scope: $scope,
@@ -152,6 +152,9 @@ angular.module('ionicParseApp.controllers', [])
         //console.log("trip started", GeoMarker.position);
         
         $scope.tripStarted = true;
+        $scope.tripControl = 'End Trip';
+        document.getElementById('start-trip').style.visibility = 'hidden';
+        document.getElementById('end-trip').style.visibility = 'visible';
         var Trip = Parse.Object.extend('Trip');
         if(!$scope.map) {
           return;

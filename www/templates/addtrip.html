@@ -1,14 +1,16 @@
+
 <ion-view title="Add a trip" right-buttons="rightButtons" hide-back-button="true">
 
     <ion-content has-header="true" has-tabs="true" padding="true">
         <!-- {{user.attributes.email}} -->
         <div id="map" data-tap-disabled="true"></div>
         <ion-footer-bar class="bar-dark"  align-title="center">
-        <div class="title" ng-cloak>
-              <a ng-click="starttrip()" class="button button-icon icon ion-navigate" ng-hide="tripStarted">Start Trip</a>
-              <a ng-click="endtrip()" class="button button-icon icon ion-navigate" ng-show="tripStarted">End Trip</a>
+        <div class="title">
+              <a ng-click="starttrip()" class="button button-icon icon ion-navigate" id="start-trip">Start</a>
+              <a ng-click="endtrip()" class="button button-icon icon ion-navigate" id="end-trip" >End</a>
              <!--  <a ng-click="endtrip()" ui-sref="app.endtrip" class="button button-icon icon ion-navigate" ng-show="tripStarted">End Trip</a> -->
               </div>
             </ion-footer-bar>
     </ion-content>
 </ion-view>
+
