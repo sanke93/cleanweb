@@ -134,16 +134,9 @@ angular.module('ionicParseApp.services', [])
       return distance;
     }
 
-      // return {
-      //     start: startWatcher,
-      //     stop: stopWatcher,
-      //     update: forceUpdate
-      // };
-    
 
     return tracker;
 })
-
 
 .factory('venmoAPIFactory', function($http) {
     var venmo = {}
@@ -173,5 +166,17 @@ angular.module('ionicParseApp.services', [])
     }
 
     return venmo;
+})
+.factory('current', function($http) {
+    var current = {}
+    var trip = {}
+    current.tripUpdate = function(_trip){
+      //console.log(trip1);
+      trip = _trip;
+    }
+    current.tripGet = function(){
+      return trip;
+    }
+    return current
 
 });
