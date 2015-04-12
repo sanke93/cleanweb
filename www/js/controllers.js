@@ -10,6 +10,7 @@ angular.module('ionicParseApp.controllers', [])
         Parse.User.logOut();
         $rootScope.user = null;
         $rootScope.isLoggedIn = false;
+
         $state.go('welcome', {
             clear: true
         });
@@ -17,6 +18,9 @@ angular.module('ionicParseApp.controllers', [])
 })
 
 .controller('WelcomeController', function($scope, $state, $rootScope, $ionicHistory, $stateParams) {
+
+    $rootScope.hasCar = false;
+    
     if ($stateParams.clear) {
         $ionicHistory.clearHistory();
         $ionicHistory.clearCache();
@@ -36,10 +40,23 @@ angular.module('ionicParseApp.controllers', [])
 })
 
 .controller('HomeController', function($scope, $state, $rootScope) {
-
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
+
+    var Car = Parse.Object.extend('Car');
+    var query = new Parse.Query(Car);
+    query.equalTo("user", Parse.User.current());
+    query.count({
+      success: function(number) {
+        if (number > 0)
+          $rootScope.hasCar = true;
+      },
+      error: function(error) {
+        alert("Error: " + error.code + " " + error.message);
+      }
+    });
+
     scope_home = $scope;
 })
 
@@ -162,7 +179,7 @@ angular.module('ionicParseApp.controllers', [])
         //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
         distanceTracker.startWatcher()
         $ionicLoading.hide();
-        
+
     };
 
     $scope.endtrip = function(){
@@ -175,8 +192,8 @@ angular.module('ionicParseApp.controllers', [])
            alertPopup.then(function(res) {
              console.log('Thank you for not eating my delicious ice cream cone');
            });
-        
-        
+
+
         var infowindow = new google.maps.InfoWindow({
               content: 'End Trip'
           });
@@ -522,28 +539,6 @@ angular.module('ionicParseApp.controllers', [])
                     }
                 })
             });
-      }
-      else
-        alert('no!!');
-          //console.log("trip started", GeoMarker.position);
-          /*$scope.tripStarted = true;
-          var Trip = Parse.Object.extend('Trip');
-          if(!$scope.map) {
-            return;
           }
-
-          var trip = new Trip();
-          trip.set('driver', $scope.user);
-         // trip.set('startPoint', ($scope.tripStarted.k, $scope.tripStarted.D));
-
-          trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
-          //trip.set('startPoint', (12,32));
-          trip.save(null, {
-              success: function(trip) {
-                  console.log('trip', trip);
-              }
-          })
-
-        alert('Vehicle ID: ' + $scope.carData.carEngine.value);*/
-    };
+      };
 });

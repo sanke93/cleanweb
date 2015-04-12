@@ -1,6 +1,7 @@
 <ion-view title="Carpooler" right-buttons="rightButtons" hide-back-button="true">
     <ion-content has-header="true" has-tabs="true" padding="true">
         Welcome {{user.attributes.email}}
-        <button class="button button-balanced button-full " ui-sref="app.addtrip">Add Trip</button>
+        <button class="button button-balanced button-full " ui-sref="app.addtrip" ng-hide="!hasCar">ADD TRIP</button>
+        <button class="button button-balanced button-full " ui-sref="app.car">ADD CAR</button>
     </ion-content>
 </ion-view>
