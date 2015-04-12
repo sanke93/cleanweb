@@ -43,7 +43,12 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
+
     $scope.date = new Date();
+    $scope.distanceTraveled = 52.39;
+    $scope.gasSaved = 2.31;
+    $scope.moneySaved = 6.52;
+
     var Car = Parse.Object.extend('Car');
     var query = new Parse.Query(Car);
     query.equalTo("user", Parse.User.current());
@@ -80,7 +85,7 @@ angular.module('ionicParseApp.controllers', [])
     $scope.venmoRedirect = function() {
          console.log('test')
          var ref = window.open(venmoAPIFactory.getUrl(), '_self', 'location=no')
-         ref.addEventListener('loadstart', function(event) { 
+         ref.addEventListener('loadstart', function(event) {
              if((event.url).startsWith("http://localhost:8100")) {
                  var string = "?access_token="
                  var accessToken = event.url.split(string)[1].split("#")[0];
@@ -518,11 +523,17 @@ angular.module('ionicParseApp.controllers', [])
             })
         }
     })
+<<<<<<< HEAD
             
     $scope.$watch('costComponents', function(val) {
         console.log('ccS', val);
     })
     
+=======
+
+
+
+>>>>>>> 50cb0f3c2fb7fc908ca3bd0b8e3aa67eb0ecf10b
 
     var cost = new Cost();
     cost.set('trip', $scope.trip)
@@ -662,7 +673,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CarController', function($scope, $ionicPopup, fuelecoAPIservice) {
+.controller('CarController', function($scope, $ionicPopup, fuelecoAPIservice, $rootScope) {
     $scope.carData = {};
     $scope.carExists = false;
 
@@ -674,6 +685,7 @@ angular.module('ionicParseApp.controllers', [])
       query.find({
         success: function(results) {
           $scope.cars = results;
+          $rootScope.carsList = $scope.cars;
           if ($scope.cars.length == 0)
           {
             $scope.nocars = true;
@@ -686,6 +698,19 @@ angular.module('ionicParseApp.controllers', [])
     };
 
     $scope.findCars();
+
+    $scope.showCars = function() {
+      var alertPopup = $ionicPopup.alert({
+          title: 'My Cars',
+          template: '<div class="item item-body">'+
+              '<ul class="list" data-ng-repeat="car in carsList">'+
+                '  <li class="small-card">{{car.attributes.make}} - {{car.attributes.model}} ({{car.attributes.year}})</li></ul>'+
+          '</div>'
+      });
+      alertPopup.then(function(res) {
+        console.log('popup closed');
+      });
+    }
 
     //Helper Functions
     $scope.reset = function(setYear, setMake, setModel, setEngine) {
