@@ -1,0 +1,34 @@
+<ion-view title="My Trips">
+    <ion-content has-header="true" has-tabs="true" padding="true">
+      <div class="card">
+        <div class="item item-divider">
+          Trip History
+        </div>
+        <div class="item item-text-wrap">
+          <div class="row">
+            <div class="col col-10"><i class="icon ion-map balanced dashboard"></i></div>
+            <div class="col">Trips</div>
+            <div class="col">{{tripsTaken}}</div>
+          </div>
+          <div class="row">
+            <div class="col col-10"><i class="icon ion-speedometer balanced dashboard"></i></div>
+            <div class="col">Distance Traveled</div>
+            <div class="col">{{distanceTraveled}} miles</div>
+          </div>
+          <div class="row">
+            <div class="col col-10"><i class="icon ion-leaf balanced dashboard"></i></div>
+            <div class="col">Gas Saved</div>
+            <div class="col">{{gasSaved}} gallons</div>
+          </div>
+          <div class="row">
+            <div class="col col-10"><i class="icon ion-social-usd balanced dashboard"></i></div>
+            <div class="col">Money Saved</div>
+            <div class="col">$ {{moneySaved}}</div>
+          </div>
+        </div>
+      </div>
+
+
+
+    </ion-content>
+</ion-view>

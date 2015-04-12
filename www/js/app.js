@@ -90,6 +90,17 @@ angular.module('ionicParseApp',
                 }
             })
 
+            .state('app.mytrips', {
+                url: '/mytrips',
+                views: {
+                    'menuContent': {
+                        templateUrl: 'templates/mytrips.html',
+                        controller: 'MyTripsController'
+                    }
+
+                }
+            })
+
             .state('app.addtrip', {
                 url: '/addtrip',
                 views: {

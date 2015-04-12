@@ -80,7 +80,7 @@ angular.module('ionicParseApp.controllers', [])
     $scope.venmoRedirect = function() {
         console.log('test')
         var ref = window.open(venmoAPIFactory.getUrl(), '_self', 'location=no')
-        ref.addEventListener('loadstart', function(event) { 
+        ref.addEventListener('loadstart', function(event) {
             if((event.url).startsWith("http://localhost:8100")) {
                 var string = "?access_token="
                 var accessToken = event.url.split(string)[1].split("#")[0];
@@ -533,6 +533,13 @@ angular.module('ionicParseApp.controllers', [])
     $scope.toggleMenu = function() {
         $scope.sideMenuController.toggleRight();
     };
+})
+
+. controller('MyTripsController', function($scope) {
+    $scope.tripsTaken = 10;
+    $scope.distanceTraveled = 432.1;
+    $scope.gasSaved = 231;
+    $scope.moneySaved = 782.21;
 })
 
 .controller('SelectCarController', function($scope, $rootScope) {
