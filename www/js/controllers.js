@@ -43,7 +43,12 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
+
     $scope.date = new Date();
+    $scope.distanceTraveled = 52.39;
+    $scope.gasSaved = 2.31;
+    $scope.moneySaved = 6.52;
+
     var Car = Parse.Object.extend('Car');
     var query = new Parse.Query(Car);
     query.equalTo("user", Parse.User.current());
@@ -80,7 +85,7 @@ angular.module('ionicParseApp.controllers', [])
     $scope.venmoRedirect = function() {
          console.log('test')
          var ref = window.open(venmoAPIFactory.getUrl(), '_self', 'location=no')
-         ref.addEventListener('loadstart', function(event) { 
+         ref.addEventListener('loadstart', function(event) {
              if((event.url).startsWith("http://localhost:8100")) {
                  var string = "?access_token="
                  var accessToken = event.url.split(string)[1].split("#")[0];
