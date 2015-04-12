@@ -438,49 +438,112 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CarController', function($scope, fuelecoAPIservice) {
     $scope.carData = {};
-    $scope.carData.carYear = '';
-    $scope.carData.carMake = '';
-    $scope.carData.carModel = '';
-    $scope.carData.carEngine = '';
 
-    $scope.yearService = "Year Service: failed.";
-    fuelecoAPIservice.getYears().success(function (response) {
-        $scope.yearService = "Year Service: succeeded.";
-        $scope.years = response.menuItem;
-    });
+    //Helper Functions
+    $scope.reset = function(setYear, setMake, setModel, setEngine) {
+        if (setYear)
+          $scope.carData.carYear = '';
+        if (setMake)
+          $scope.carData.carMake = '';
+        if (setModel)
+          $scope.carData.carModel = '';
+        if (setEngine)
+          $scope.carData.carEngine = '';
+    }
 
     $scope.listify = function(obj, value) {
         if (obj == undefined)
           return [value];
         return value;
     };
+    //End Helpers
+
+    $scope.reset(true, true, true, true);
+
+    fuelecoAPIservice.getYears().success(function (response) {
+        console.log("Year Service: succeeded.");
+        $scope.years = response.menuItem;
+        $scope.reset(false, true, true, true);
+    });
 
     $scope.updateMake = function() {
-        $scope.makeService = "Make Service: failed."
         fuelecoAPIservice.getMakes($scope.carData.carYear.value).success(function (response) {
-            $scope.makeService = "Make Service: succeeded."
+            console.log("Make Service: succeeded.");
             $scope.makes = $scope.listify(response.menuItem.length, response.menuItem);
+            $scope.reset(false, false, true, true);
         });
     };
 
     $scope.updateModel = function() {
-        $scope.modelService = "Model Service: failed."
         fuelecoAPIservice.getModels($scope.carData.carYear.value, $scope.carData.carMake.value).success(function (response) {
-            $scope.modelService = "Model Service: succeeded."
+            console.log("Model Service: succeeded.");
             $scope.models = $scope.listify(response.menuItem.length, response.menuItem);
+            $scope.reset(false, false, false, true);
         });
     };
 
     $scope.updateEngine = function() {
-        scopetesting = $scope;
-        $scope.vehicleService = "Vehicle Service: failed."
         fuelecoAPIservice.getVehicles($scope.carData.carYear.value, $scope.carData.carMake.value, $scope.carData.carModel.value).success(function (response) {
-            $scope.vehicleService = "Vehicle Service: succeeded."
+            console.log("Vehicle Service: succeeded.");
             $scope.vehicles = $scope.listify(response.menuItem.length, response.menuItem);
         });
     };
 
     $scope.addCar = function() {
-        alert('Vehicle ID: ' + $scope.carData.carEngine.value);
+      if ($scope.carData.carEngine.value != undefined &&
+          $scope.carData.carEngine.value != "") {
+            var Car = Parse.Object.extend('Car');
+            var car = new Car();
+
+            fuelecoAPIservice.getVehicleMPG($scope.carData.carEngine.value).success(function (response) {
+                console.log("Vehicle MPG Service: succeeded.");
+                $scope.avgMPG = response.avgMpg;
+            });
+
+            fuelecoAPIservice.getVehicleInfo($scope.carData.carEngine.value).success(function (response) {
+                console.log("Vehicle Info Service: succeeded.");
+                $scope.gasType = response.fuelType;
+                if ($scope.avgMPG == undefined)
+                {
+                  $scope.avgMPG = (parseFloat(response.UCity) + parseFloat(response.UHighway))/2.0;
+                }
+
+                car.set('user', $scope.user);
+                car.set('dbId', $scope.carData.carEngine.value);
+                car.set('avgMPG', $scope.avgMPG.toString());
+                car.set('gasType', $scope.gasType);
+                car.set('make', $scope.carData.carMake.value);
+                car.set('model', $scope.carData.carModel.value);
+                car.set('year', parseInt($scope.carData.carYear.value));
+
+                car.save(null, {
+                    success: function(car) {
+                        console.log('car', car);
+                    }
+                })
+            });
+      }
+      else
+        alert('no!!');
+          //console.log("trip started", GeoMarker.position);
+          /*$scope.tripStarted = true;
+          var Trip = Parse.Object.extend('Trip');
+          if(!$scope.map) {
+            return;
+          }
+
+          var trip = new Trip();
+          trip.set('driver', $scope.user);
+         // trip.set('startPoint', ($scope.tripStarted.k, $scope.tripStarted.D));
+
+          trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
+          //trip.set('startPoint', (12,32));
+          trip.save(null, {
+              success: function(trip) {
+                  console.log('trip', trip);
+              }
+          })
+
+        alert('Vehicle ID: ' + $scope.carData.carEngine.value);*/
     };
 });
