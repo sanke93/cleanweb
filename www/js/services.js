@@ -50,7 +50,7 @@ angular.module('ionicParseApp.services', [])
     return fuelecoAPI;
 })
 
-.factory('distanceTracker', function($http) {
+.factory('distanceTracker', function($http, $rootScope) {
 
     //var distance = {};
     var tracker = {}
@@ -93,7 +93,9 @@ angular.module('ionicParseApp.services', [])
         var lastPos = coords[coords.length-1];
         if(lastPos) {
             distance += tracker.calculateDistance(lastPos, position.coords);
-            console.log("distance", distance)
+            console.log("distance", distance, position.coords);
+            $rootScope.map.panTo(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+            //$rootScope.map.panTo(55.9879314,-4.3042387);
         }
 
         // Add new coordinates to array

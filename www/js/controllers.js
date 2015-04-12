@@ -136,6 +136,7 @@ angular.module('ionicParseApp.controllers', [])
             mapOptions);
 
         $scope.map = map;
+        $rootScope.map = $scope.map;
         $scope.geoMarker = new GeolocationMarker(map);
         $ionicLoading.hide();
       }, function(error) {
