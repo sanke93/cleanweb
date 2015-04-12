@@ -141,9 +141,9 @@ angular.module('ionicParseApp.services', [])
 .factory('current', function($http) {
     var current = {}
     var trip = {}
-    current.tripUpdate = function(trip1){
-      console.log(trip1);
-      trip = trip1;
+    current.tripUpdate = function(_trip){
+      //console.log(trip1);
+      trip = _trip;
     }
     current.tripGet = function(){
       return trip;
