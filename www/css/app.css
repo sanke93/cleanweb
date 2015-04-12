@@ -24,6 +24,10 @@
   font-size: 48px;
 }
 
+.dashboard {
+  font-size: 24px;
+}
+
 .wrapper-center {
   text-align: center;
 }
@@ -56,4 +60,3 @@
 .home-screen{
   padding-top: 30px;
 }
-

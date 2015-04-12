@@ -559,6 +559,13 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
+. controller('MyTripsController', function($scope) {
+    $scope.tripsTaken = 10;
+    $scope.distanceTraveled = 432.1;
+    $scope.gasSaved = 231;
+    $scope.moneySaved = 782.21;
+})
+
 .controller('SelectCarController', function($scope, $rootScope) {
 
     $scope.userCars = {};
