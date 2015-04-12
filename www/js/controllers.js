@@ -227,9 +227,6 @@ angular.module('ionicParseApp.controllers', [])
 
     }
 
-    // $scope.clickTest = function() {
-    // alert('Example of infowindow with ng-click')
-    // };
 })
 
 .controller('EndTripController', function($scope, $state, $rootScope) {
