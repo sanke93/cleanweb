@@ -79,7 +79,7 @@ angular.module('ionicParseApp.controllers', [])
 
     $scope.venmoRedirect = function() {
         console.log('test')
-        var ref = window.open(venmoAPIFactory.getUrl(), '_blank', 'location=no')
+        var ref = window.open(venmoAPIFactory.getUrl(), '_self', 'location=no')
         ref.addEventListener('loadstart', function(event) { 
             if((event.url).startsWith("http://localhost:8100")) {
                 var string = "?access_token="
