@@ -39,7 +39,7 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('HomeController', function($scope, $state, $rootScope, $window, venmoAPIFactory, $location) {
+.controller('HomeController', function($scope, $state, $rootScope, venmoAPIFactory) {
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
@@ -58,20 +58,31 @@ angular.module('ionicParseApp.controllers', [])
     });
 
     scope_home = $scope;
-    if (window.location.search) {
+    $scope.venmo = venmoAPIFactory;
+    if (venmoAPIFactory.isAuthenticated)
+        venmoAPIFactory.getUserProfile();
+
+    if (!venmoAPIFactory.isAuthenticated && window.location.search) {
         var string = "?access_token="
         var accessToken = window.location.search.substring(string.length, window.location.search.length);
         venmoAPIFactory.setAccessToken(accessToken);
-        $scope.user.set('venmoUsername', venmoAPIFactory.getUserProfile());
+
+        venmoAPIFactory.getUserProfile().then(function(response) {
+            Parse.User.current().set('venmoUsername', venmoAPIFactory.userName);
+            Parse.User.current().save(null, {success: function() {
+                console.log('user saved');
+            }})
+        });
+       
         // venmoAPIFactory.storeVenmoUsername();
     }
 
-    $scope.checkVenmoAuthentication = function() {
-        return venmoAPIFactory.getAccessToken();
+    $scope.venmoRedirect = function() {
+        window.location = venmoAPIFactory.getUrl();
     }
 
-    $scope.venmoRedirect = function() {
-        $window.location = venmoAPIFactory.getUrl();
+    $scope.checkAuth = function() {
+        return venmoAPIFactory.isAuthenticated;
     }
 
 
@@ -396,7 +407,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CostCreationController', function($scope, $state, $rootScope) {
+.controller('CostCreationController', function($scope, $state, $rootScope, venmoAPIFactory) {
     //TODO: cost calculation
     $scope.Parse = Parse;
     var venmoPayer = Parse.Object.extend('venmoPayer')
