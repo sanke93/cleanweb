@@ -95,22 +95,22 @@ angular.module('ionicParseApp.controllers', [])
     }
 
     $scope.selectcar = function() {
-      var showPopup = $ionicPopup.show({
+      $rootScope.showCarPopup = $ionicPopup.show({
         scope: $scope,
         title: 'Select Car',
         templateUrl: '/templates/selectcar.html'
       });
-      showPopup.then(function(res) {
+      $rootScope.showCarPopup.then(function(res) {
         console.log('Thank you for not eating my delicious ice cream cone');
       });
     }
-
+    $scope.selectcar();
     console.log("Hi", $scope.user.attributes.email);
     scope_trip = $scope;
     dist_track = distanceTracker;
     hi = current;
     initialize = function () {
-      $scope.selectcar();
+      
       //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
       $scope.startLocation = {}
       $scope.loading1 = $ionicLoading.show({
@@ -167,17 +167,18 @@ angular.module('ionicParseApp.controllers', [])
 
     $scope.starttrip = function() {
         //console.log("trip started", GeoMarker.position);
-        $scope.selectcar();
+        
         $scope.tripStarted = true;
         var Trip = Parse.Object.extend('Trip');
         if(!$scope.map) {
           return;
         }
-
+        console.log("car selected");
         var trip = new Trip();
+        console.log("car", $rootScope.currentSelectedCar);
         trip.set('driver', $scope.user);
        // trip.set('startPoint', ($scope.tripStarted.k, $scope.tripStarted.D));
-
+        trip.set('car', $rootScope.currentSelectedCar);
         trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
         //trip.set('startPoint', (12,32));
         trip.save(null, {
@@ -226,13 +227,13 @@ angular.module('ionicParseApp.controllers', [])
     $scope.endtrip = function(){
         console.log("end", $scope.geoMarker);
         distanceTracker.stopWatcher()
-           var alertPopup = $ionicPopup.alert({
-             title: 'Trip Details',
-             template: 'Total Distance: '+ distanceTracker.getDistance(),
-           });
-           alertPopup.then(function(res) {
-             console.log('Thank you for not eating my delicious ice cream cone');
-           });
+       var alertPopup = $ionicPopup.alert({
+         title: 'Trip Details',
+         template: 'Total Distance: '+ distanceTracker.getDistance(),
+       });
+       alertPopup.then(function(res) {
+         console.log('Thank you for not eating my delicious ice cream cone');
+       });
 
 
         var infowindow = new google.maps.InfoWindow({
@@ -535,7 +536,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('SelectCarController', function($scope) {
+.controller('SelectCarController', function($scope, $rootScope) {
 
     $scope.userCars = {};
 
@@ -559,8 +560,11 @@ angular.module('ionicParseApp.controllers', [])
     };
 
     $scope.selectCar = function() {
-        /*$scope.trip = $scope.userCars.car.id
-        $rootScope.showPopup.close();*/
+        //$scope.trip = $scope.userCars.car.id
+        $rootScope.showCarPopup.close();
+        $rootScope.currentSelectedCar = $scope.userCars.car;
+        //console.log("selected", $rootScope, $scope.userCars.car);
+
     };
 })
 
