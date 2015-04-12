@@ -77,7 +77,7 @@ angular.module('ionicParseApp.controllers', [])
             mapOptions);
 
         $scope.map = map;
-        GeoMarker = new GeolocationMarker(map);
+        $scope.geoMarker = new GeolocationMarker(map);
         $ionicLoading.hide();
       }, function(error) {
         alert('Unable to get location: ' + error.message);
@@ -85,20 +85,6 @@ angular.module('ionicParseApp.controllers', [])
       //var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
       //var end = new google.maps.LatLng(55.8934378,-4.2201905);
 
-      var mapOptions = {
-        streetViewControl:true,
-        center: startLocation,
-        zoom: 18,
-        //mapTypeId: google.maps.MapTypeId.TERRAIN
-      };
-      var map = new google.maps.Map(document.getElementById("map"),
-          mapOptions);
-
-      //Marker + infowindow + angularjs compiled ng-click
-
-
-      $scope.map = map;
-      var GeoMarker = new GeolocationMarker(map);
 
       // var directionsService = new google.maps.DirectionsService();
       // var directionsDisplay = new google.maps.DirectionsRenderer();
@@ -138,6 +124,7 @@ angular.module('ionicParseApp.controllers', [])
         trip.save(null, {
             success: function(trip) {
                 console.log('trip', trip);
+                $scope.currentTrip = trip
             }
         })
         var infowindow = new google.maps.InfoWindow({
@@ -172,10 +159,36 @@ angular.module('ionicParseApp.controllers', [])
         // });
         //$scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
         //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
-
-        $scope.loading.hide();
-
+        
+        $ionicLoading.hide();
+        
     };
+
+    $scope.endtrip = function(){
+        console.log("end", $scope.geoMarker);
+        var infowindow = new google.maps.InfoWindow({
+              content: 'End Trip'
+          });
+
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng($scope.geoMarker.position.k, $scope.geoMarker.position.D),
+          map: $scope.map,
+          title: 'Trip'
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open($scope.map,marker);
+        });
+
+        $scope.currentTrip.set('endPoint', new Parse.GeoPoint({latitude: $scope.geoMarker.position.k, longitude: $scope.geoMarker.position.D}));
+        $scope.currentTrip.set('endedAt', new Date());
+        //trip.set('startPoint', (12,32));
+        $scope.currentTrip.save(null, {
+            success: function(trip) {
+                console.log('trip', trip);
+                $scope.currentTrip = trip
+            }
+        })
+    }
 
     // $scope.clickTest = function() {
     // alert('Example of infowindow with ng-click')
