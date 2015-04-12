@@ -6,9 +6,9 @@
 // 'ionicParseApp.controllers' is found in controllers.js
 // 'ionicParseApp.services' is found in services.js
 angular.module('ionicParseApp',
-        [ 'ionic', 'ionicParseApp.controllers', 'ionicParseApp.services' ]
+        [ 'ionic', 'ionicParseApp.controllers', 'ionicParseApp.services', 'ngRoute' ]
     )
-    .config(function($stateProvider, $urlRouterProvider) {
+    .config(function($stateProvider, $urlRouterProvider, $routeProvider) {
 
         // Ionic uses AngularUI Router which uses the concept of states
         // Learn more here: https://github.com/angular-ui/ui-router
@@ -117,7 +117,7 @@ angular.module('ionicParseApp',
         var currentUser = Parse.User.current();
         $rootScope.user = null;
         $rootScope.isLoggedIn = false;
-
+        $rootScope.CLIENT_ID = 2532;
         if (currentUser) {
             $rootScope.user = currentUser;
             $rootScope.isLoggedIn = true;

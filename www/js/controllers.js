@@ -39,7 +39,7 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('HomeController', function($scope, $state, $rootScope) {
+.controller('HomeController', function($scope, $routeParams, $state, $rootScope, $window, venmoAPIFactory, $location) {
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
@@ -58,9 +58,26 @@ angular.module('ionicParseApp.controllers', [])
     });
 
     scope_home = $scope;
+    if (window.location.search) {
+        var string = "?access_token="
+        var accessToken = window.location.search.substring(string.length, window.location.search.length);
+        venmoAPIFactory.setAccessToken(accessToken);
+        $scope.user.set('venmoUsername', venmoAPIFactory.getUserProfile());
+        // venmoAPIFactory.storeVenmoUsername();
+    }
+
+    $scope.checkVenmoAuthentication = function() {
+        return venmoAPIFactory.getAccessToken();
+    }
+
+    $scope.venmoRedirect = function() {
+        $window.location = venmoAPIFactory.getUrl();
+    }
+
+
 })
 
-.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup) {
+.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup, current) {
 
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
@@ -80,6 +97,7 @@ angular.module('ionicParseApp.controllers', [])
     console.log("Hi", $scope.user.attributes.email);
     scope_trip = $scope;
     dist_track = distanceTracker;
+    hi = current;
     initialize = function () {
       $scope.selectcar();
       //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
@@ -152,9 +170,9 @@ angular.module('ionicParseApp.controllers', [])
         trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
         //trip.set('startPoint', (12,32));
         trip.save(null, {
-            success: function(trip) {
-                console.log('trip', trip);
-                $scope.currentTrip = trip
+            success: function(tripSaved) {
+                console.log('trip save', tripSaved);
+                $scope.currentTrip = tripSaved
             }
         })
         var infowindow = new google.maps.InfoWindow({
@@ -223,18 +241,16 @@ angular.module('ionicParseApp.controllers', [])
         $scope.currentTrip.set('endedAt', new Date());
         //trip.set('startPoint', (12,32));
         $scope.currentTrip.save(null, {
-            success: function(trip) {
-                console.log('trip', trip.attributes.endpoint);
-                $scope.currentTrip = trip
+            success: function(tripSaved) {
+                console.log('trip saved', tripSaved);
+                $scope.currentTrip = tripSaved;
+                current.tripUpdate($scope.currentTrip);
             }
         })
 
 
     }
 
-    // $scope.clickTest = function() {
-    // alert('Example of infowindow with ng-click')
-    // };
 })
 
 .controller('EndTripController', function($scope, $state, $rootScope) {
@@ -381,11 +397,19 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CostCreationController', function($scope, $state, $rootScope) {
     //TODO: cost calculation
+    $scope.Parse = Parse;
     var venmoPayer = Parse.Object.extend('venmoPayer')
+    var venmoPayerQuery = new Parse.Query(venmoPayer)
+    venmoPayerQuery.equalTo("user", $scope.user);
+    venmoPayerQuery.find({
+        success: function(results) {
+            console.log('results', results);
+            $scope.currentUserVenmoPayer = results[0];
+        }
+    })
     blahblah = $scope;
     $scope.data = {};
 
-    console.log('tetst');
     $scope.rideCost = 10.00;
     $scope.data.venmoUsername = '';
     $scope.payerList = [];
@@ -429,12 +453,28 @@ angular.module('ionicParseApp.controllers', [])
         $scope.payerList.push($scope.payerInstance);
     }
 
+
     $scope.createPayments = function() {
-        var Payment = Parse.objects.extend('Payment')
-        var payment = new Payment();
-        payment.set('amount', $scope.rideCost/($scope.payerList.length + 1))
-        payment.set('cost', cost);
-        payment.set('')
+        for (index in $scope.payerList) {
+            payer = $scope.payerList[index];
+            payer.save(null, {
+                success: function(payer) {
+                    console.log('payer', payer, $scope.rideCost);
+                    var Payment = $scope.Parse.Object.extend('Payment')
+                    var payment = new Payment();
+                    payment.set('amount', $scope.rideCost/($scope.payerList.length + 1))
+                    payment.set('paidTowards', cost);
+                    payment.set('paidTo', $scope.currentUserVenmoPayer);
+                    payment.set('paidBy', payer);
+                    payment.save(null, {
+                        success: function(payment) {
+                            console.log('payment saved', payment);
+                        }
+                    })
+                }
+            })
+        }
+        
     }
 })
 
