@@ -10,7 +10,7 @@
 			<ion-nav-buttons side="right" >
 				<button class="button" ui-sref="app.addtrip" ng-hide="!isLoggedIn">Add Trip</button>
 			</ion-nav-buttons>
-			
+
 		</ion-nav-bar>
 		<ion-nav-view name="menuContent"></ion-nav-view>
 	</ion-side-menu-content>
@@ -22,6 +22,7 @@
 		<ion-content>
 			<ion-list>
 				<ion-item nav-clear menu-close ui-sref="app.home">Home</ion-item>
+				<ion-item nav-clear menu-close ui-sref="app.car" ng-hide="!isLoggedIn">Add Car</ion-item>
 				<ion-item nav-clear menu-close ui-sref="app.addtrip" ng-hide="!isLoggedIn">Add Trip</ion-item>
 				<ion-item nav-clear menu-close ui-sref="app.login" ng-hide="isLoggedIn">Login</ion-item>
 				<ion-item nav-clear menu-close ui-sref="app.register" ng-hide="isLoggedIn">Register</ion-item>
