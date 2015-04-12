@@ -140,7 +140,7 @@ angular.module('ionicParseApp.services', [])
 
 .factory('venmoAPIFactory', function($http) {
     var venmo = {}
-    venmo.oAuth_url = "https://api.venmo.com/v1/oauth/authorize?client_id=2532&scope=make_payments%20access_friends%20access_profile";
+    venmo.oAuth_url = "https://api.venmo.com/v1/oauth/authorize?client_id=2532&scope=make_payments%20access_profile%20access_friends";
 
     venmo.getUrl = function() {
         return venmo.oAuth_url;
@@ -150,24 +150,59 @@ angular.module('ionicParseApp.services', [])
         venmo.accessToken = token;
     }
 
+    venmo.setVenmoUserId = function(id) {
+        venmo.venmoUserId = id;
+    }
+
     venmo.getAccessToken = function() {
         return venmo.accessToken;
     }
 
     venmo.getFriends = function() {
-        return []
+        return $http({
+          method: 'GET',
+          url: "https://api.venmo.com/v1/users/"+venmo.userId+"/friends?access_token="+venmo.getAccessToken()
+        }).success(function(response) {
+          return response.data;
+        })
     }
 
     venmo.getUserProfile = function() {
         return $http({
           method: 'GET',
           url: "https://api.venmo.com/v1/me?access_token="+venmo.getAccessToken()
+        }).success(function(response) {
+          venmo.isAuthenticated = true;
+          venmo.userName = response.data.user.username;
+          venmo.userId = response.data.user.id;
+        }).error(function(err) {
+          venmo.isAuthenticated = false;
+          venmo.userName = undefined;
+          venmo.userId = undefined;
         });
     }
 
+    venmo.checkAuth = function() {
+        return venmo.isAuthenticated;
+    }
+    if (venmo.accessToken) {
+        return $http({
+          method: 'GET',
+          url: "https://api.venmo.com/v1/me?access_token="+venmo.getAccessToken()
+        }).success(function(response) {
+          venmo.isAuthenticated = true;
+          venmo.userName = response.data.user.username;
+        }).error(function(err) {
+          venmo.isAuthenticated = false;
+          venmo.userName = undefined;
+        });
+    }
+
+    else venmo.isAuthenticated = false;
     return venmo;
 })
-.factory('current', function($http) {
+
+.factory('current', function($http) { 
     var current = {}
     var trip = {}
     current.tripUpdate = function(_trip){
