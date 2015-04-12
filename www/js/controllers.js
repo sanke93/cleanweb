@@ -39,7 +39,7 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('HomeController', function($scope, $state, $rootScope, $window) {
+.controller('HomeController', function($scope, $routeParams, $state, $rootScope, $window, venmoAPIFactory, $location) {
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
@@ -58,11 +58,23 @@ angular.module('ionicParseApp.controllers', [])
     });
 
     scope_home = $scope;
+    if (window.location.search) {
+        var string = "?access_token="
+        var accessToken = window.location.search.substring(string.length, window.location.search.length);
+        venmoAPIFactory.setAccessToken(accessToken);
+        $scope.user.set('venmoUsername', venmoAPIFactory.getUserProfile());
+        // venmoAPIFactory.storeVenmoUsername();
+    }
+
+    $scope.checkVenmoAuthentication = function() {
+        return venmoAPIFactory.getAccessToken();
+    }
 
     $scope.venmoRedirect = function() {
-        $window.location = "https://api.venmo.com/v1/oauth/authorize?client_id=2532&scope=make_payments%20access_friends"
-
+        $window.location = venmoAPIFactory.getUrl();
     }
+
+
 })
 
 .controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup) {

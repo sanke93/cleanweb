@@ -142,4 +142,36 @@ angular.module('ionicParseApp.services', [])
     
 
     return tracker;
+})
+
+
+.factory('venmoAPIFactory', function($http) {
+    var venmo = {}
+    venmo.oAuth_url = "https://api.venmo.com/v1/oauth/authorize?client_id=2532&scope=make_payments%20access_friends%20access_profile";
+
+    venmo.getUrl = function() {
+        return venmo.oAuth_url;
+    }
+
+    venmo.setAccessToken = function(token) {
+        venmo.accessToken = token;
+    }
+
+    venmo.getAccessToken = function() {
+        return venmo.accessToken;
+    }
+
+    venmo.getFriends = function() {
+        return []
+    }
+
+    venmo.getUserProfile = function() {
+        return $http({
+          method: 'GET',
+          url: "https://api.venmo.com/v1/me?access_token="+venmo.getAccessToken()
+        });
+    }
+
+    return venmo;
+
 });
