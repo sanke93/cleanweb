@@ -559,16 +559,35 @@ angular.module('ionicParseApp.controllers', [])
     };
 
     $scope.selectCar = function() {
-        //$scope.trip = $scope.userCars.car.id
         $rootScope.showCarPopup.close();
         $rootScope.currentSelectedCar = $scope.userCars.car;
-        //console.log("selected", $rootScope, $scope.userCars.car);
-
     };
 })
 
 .controller('CarController', function($scope, $ionicPopup, fuelecoAPIservice) {
     $scope.carData = {};
+    $scope.carExists = false;
+
+    $scope.findCars = function() {
+      var Car = Parse.Object.extend('Car');
+      var query = new Parse.Query(Car);
+      query.equalTo("user", Parse.User.current());
+      query.descending("avgMPG");
+      query.find({
+        success: function(results) {
+          $scope.cars = results;
+          if ($scope.cars.length == 0)
+          {
+            $scope.nocars = true;
+          }
+        },
+        error: function(error) {
+          alert("Error: " + error.code + " " + error.message);
+        }
+      });
+    };
+
+    $scope.findCars();
 
     //Helper Functions
     $scope.reset = function(setYear, setMake, setModel, setEngine) {
@@ -595,6 +614,7 @@ angular.module('ionicParseApp.controllers', [])
         console.log("Year Service: succeeded.");
         $scope.years = response.menuItem;
         $scope.reset(false, true, true, true);
+        $scope.carExists = false;
     });
 
     $scope.updateMake = function() {
@@ -602,6 +622,7 @@ angular.module('ionicParseApp.controllers', [])
             console.log("Make Service: succeeded.");
             $scope.makes = $scope.listify(response.menuItem.length, response.menuItem);
             $scope.reset(false, false, true, true);
+            $scope.carExists = false;
         });
     };
 
@@ -610,6 +631,7 @@ angular.module('ionicParseApp.controllers', [])
             console.log("Model Service: succeeded.");
             $scope.models = $scope.listify(response.menuItem.length, response.menuItem);
             $scope.reset(false, false, false, true);
+            $scope.carExists = false;
         });
     };
 
@@ -617,7 +639,27 @@ angular.module('ionicParseApp.controllers', [])
         fuelecoAPIservice.getVehicles($scope.carData.carYear.value, $scope.carData.carMake.value, $scope.carData.carModel.value).success(function (response) {
             console.log("Vehicle Service: succeeded.");
             $scope.vehicles = $scope.listify(response.menuItem.length, response.menuItem);
+            $scope.carExists = false;
         });
+    };
+
+    $scope.updateCar = function() {
+        console.log('hey: ' + $scope.carData.carEngine.value);
+        fuelecoAPIservice.getVehicleMPG($scope.carData.carEngine.value).success(function (response) {
+            console.log("Vehicle MPG Service: succeeded.");
+            $scope.avgMPG = response.avgMpg;
+        });
+
+        fuelecoAPIservice.getVehicleInfo($scope.carData.carEngine.value).success(function (response) {
+            console.log("Vehicle Info Service: succeeded.");
+            $scope.gasType = response.fuelType;
+            if ($scope.avgMPG == undefined)
+            {
+              $scope.avgMPG = (parseFloat(response.UCity) + parseFloat(response.UHighway))/2.0;
+              $scope.mpg = $scope.avgMPG.toFixed(2);
+            }
+        });
+        $scope.carExists = true;
     };
 
     $scope.addCar = function() {
@@ -626,40 +668,27 @@ angular.module('ionicParseApp.controllers', [])
             var Car = Parse.Object.extend('Car');
             var car = new Car();
 
-            fuelecoAPIservice.getVehicleMPG($scope.carData.carEngine.value).success(function (response) {
-                console.log("Vehicle MPG Service: succeeded.");
-                $scope.avgMPG = response.avgMpg;
-            });
+            car.set('user', $scope.user);
+            car.set('dbId', $scope.carData.carEngine.value);
+            car.set('avgMPG', $scope.avgMPG.toString());
+            car.set('gasType', $scope.gasType);
+            car.set('make', $scope.carData.carMake.value);
+            car.set('model', $scope.carData.carModel.value);
+            car.set('year', parseInt($scope.carData.carYear.value));
 
-            fuelecoAPIservice.getVehicleInfo($scope.carData.carEngine.value).success(function (response) {
-                console.log("Vehicle Info Service: succeeded.");
-                $scope.gasType = response.fuelType;
-                if ($scope.avgMPG == undefined)
-                {
-                  $scope.avgMPG = (parseFloat(response.UCity) + parseFloat(response.UHighway))/2.0;
+            car.save(null, {
+                success: function(car) {
+                    console.log('car', car);
+                    console.log('hello');
+                    var alertPopup = $ionicPopup.alert({
+                        title: 'Your car was successfully added!',
+                    });
+                    alertPopup.then(function(res) {
+                      $scope.findCars();
+                      console.log('popup closed');
+                    });
                 }
-
-                car.set('user', $scope.user);
-                car.set('dbId', $scope.carData.carEngine.value);
-                car.set('avgMPG', $scope.avgMPG.toString());
-                car.set('gasType', $scope.gasType);
-                car.set('make', $scope.carData.carMake.value);
-                car.set('model', $scope.carData.carModel.value);
-                car.set('year', parseInt($scope.carData.carYear.value));
-
-                car.save(null, {
-                    success: function(car) {
-                        console.log('car', car);
-                        console.log('hello');
-                        var alertPopup = $ionicPopup.alert({
-                            title: 'Your car was successfully added!',
-                        });
-                        alertPopup.then(function(res) {
-                          console.log('popup closed');
-                        });
-                    }
-                });
             });
-          }
-      };
+      }
+    };
 });
