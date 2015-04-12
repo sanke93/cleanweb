@@ -24,6 +24,10 @@
   font-size: 48px;
 }
 
+.wrapper-center {
+  text-align: center;
+}
+
 .popup-show {
   height: 350px;
 }
