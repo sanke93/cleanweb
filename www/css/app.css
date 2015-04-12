@@ -19,3 +19,11 @@
 .padding {
   padding: 0;
 }
+
+.rating {
+  font-size: 48px;
+}
+
+.popup-show {
+  height: 350px;
+}

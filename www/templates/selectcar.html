@@ -1,0 +1,37 @@
+<div class="popup-show" ng-controller="SelectCarController">
+    <label class="item item-input item-select">
+      <div class="input-label">
+        Cars
+      </div>
+      <select ng-model="userCars.car" ng-options="car.attributes.make for car in cars" ng-change="updateCarStats()">
+      </select>
+    </label>
+
+    <div ng-hide="carInfo == undefined">
+      <div class="list card">
+        <div class="item">
+          <div class="row">
+            <div class="col-33">
+              <i class="icon ion-record rating assertive"></i>
+            </div>
+            <div class="col">
+              <h2>{{carInfo.make}} - {{carInfo.model}}</h2>
+              <p>{{carInfo.year}}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="item item-body">
+          <p>
+            Avg MPG: {{carInfo.avgMPG}}
+          </p>
+          <p>
+            Fuel Type: {{carInfo.gasType}}
+          </p>
+        </div>
+      </div>
+      <button class="button button-positive">
+        SELECT CAR
+      </button>
+    </div>
+</div>
