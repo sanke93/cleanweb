@@ -249,6 +249,7 @@ angular.module('ionicParseApp.controllers', [])
         //update Trip
         $scope.currentTrip.set('endPoint', new Parse.GeoPoint({latitude: $scope.geoMarker.position.k, longitude: $scope.geoMarker.position.D}));
         $scope.currentTrip.set('endedAt', new Date());
+        $scope.currentTrip.set('totalDist', parseInt((distanceTracker.getDistance()).toFixed(2)));
         //trip.set('startPoint', (12,32));
         $scope.currentTrip.save(null, {
             success: function(tripSaved) {
