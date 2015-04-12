@@ -1,17 +1,5 @@
 <ion-view title="My Car">
     <ion-content has-header="true" has-tabs="true" padding="true">
-        <div class="list card" ng-hide="nocars" ng-cloak>
-          <div class="item">
-            Added Cars
-          </div>
-
-          <div class="item item-body">
-            <ul class="list" data-ng-repeat="car in cars">
-                <li class="small-card">{{car.attributes.make}} - {{car.attributes.model}} ({{car.attributes.year}})</li>
-            </ul>
-          </div>
-        </div>
-
         <div class="list">
             <label class="item item-input item-select">
               <div class="input-label">
@@ -44,31 +32,35 @@
         </div>
 
         <div ng-hide="!carExists" ng-cloak>
-          <div class="list card">
-            <div class="item">
-              <div class="row">
-                <div class="col-33">
-                  <i class="icon rating" ng-class="{'assertive': mpg < 20, 'energized': mpg >= 20 && mpg <30, 'balanced': mpg >= 30, 'ion-record': mpg < 50, 'ion-leaf': mpg >= 50 }"></i>
-                </div>
-                <div class="col">
-                  <h2>{{carData.carMake.text}}
-                  <p>{{carData.carModel.text}}</p>
-                  <p>{{carData.carYear.text}}</p>
+            <div class="list card">
+              <div class="item">
+                <div class="row">
+                  <div class="col-33">
+                    <i class="icon rating" ng-class="{'assertive': mpg < 20, 'energized': mpg >= 20 && mpg <30, 'balanced': mpg >= 30, 'ion-record': mpg < 50, 'ion-leaf': mpg >= 50 }"></i>
+                  </div>
+                  <div class="col">
+                    <h2>{{carData.carMake.text}}
+                    <p>{{carData.carModel.text}}</p>
+                    <p>{{carData.carYear.text}}</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="item item-body">
-              <p>
-                Avg MPG: {{mpg}}
-              </p>
-              <p>
-                Fuel Type: {{gasType}}
-              </p>
-            </div>
-        </div>
-        <button class="button button-block button-balanced" ng-click="addCar()">
-            ADD MY CAR
-        </button>
+              <div class="item item-body">
+                <p>
+                  Avg MPG: {{mpg}}
+                </p>
+                <p>
+                  Fuel Type: {{gasType}}
+                </p>
+              </div>
+          </div>
+          <button class="button button-block button-balanced" ng-click="addCar()">
+              Add This Car
+          </button>
+      </div>
+      <button class="button button-block button-balanced" ng-hide="nocars" ng-click="showCars()">
+        See My Cars
+      </button>
     </ion-content>
 </ion-view>

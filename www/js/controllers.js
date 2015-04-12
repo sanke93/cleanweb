@@ -434,8 +434,8 @@ angular.module('ionicParseApp.controllers', [])
     // tripQuery.exists("totalDist");
     // tripQuery.descending("updatedAt");
     $scope.trip = current.tripGet();
-        
-            
+
+
     console.log('trip', $scope.trip);
     var totalDist = $scope.trip.get("totalDist");
     var carId = $scope.trip.get("car").id;
@@ -456,9 +456,9 @@ angular.module('ionicParseApp.controllers', [])
             })
         }
     })
-            
-        
-    
+
+
+
 
     var cost = new Cost();
     cost.set('trip', $scope.trip)
@@ -595,7 +595,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CarController', function($scope, $ionicPopup, fuelecoAPIservice) {
+.controller('CarController', function($scope, $ionicPopup, fuelecoAPIservice, $rootScope) {
     $scope.carData = {};
     $scope.carExists = false;
 
@@ -607,6 +607,7 @@ angular.module('ionicParseApp.controllers', [])
       query.find({
         success: function(results) {
           $scope.cars = results;
+          $rootScope.carsList = $scope.cars;
           if ($scope.cars.length == 0)
           {
             $scope.nocars = true;
@@ -619,6 +620,19 @@ angular.module('ionicParseApp.controllers', [])
     };
 
     $scope.findCars();
+
+    $scope.showCars = function() {
+      var alertPopup = $ionicPopup.alert({
+          title: 'My Cars',
+          template: '<div class="item item-body">'+
+              '<ul class="list" data-ng-repeat="car in carsList">'+
+                '  <li class="small-card">{{car.attributes.make}} - {{car.attributes.model}} ({{car.attributes.year}})</li></ul>'+
+          '</div>'
+      });
+      alertPopup.then(function(res) {
+        console.log('popup closed');
+      });
+    }
 
     //Helper Functions
     $scope.reset = function(setYear, setMake, setModel, setEngine) {
