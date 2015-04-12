@@ -198,6 +198,22 @@ angular.module('ionicParseApp.services', [])
     venmo.checkAuth = function() {
         return venmo.isAuthenticated;
     }
+
+    venmo.chargeUser = function(user_id, amount) {
+        var postUrl = "https://api.venmo.com/v1/payments"
+
+        return $http({
+          method: 'POST',
+          url:postUrl,
+          data: { access_token: venmo.getAccessToken(),
+                  amount: amount,
+                  user_id: user_id.toString(),
+                  note: 'Carpooler' }
+        }).success(function(response) {
+          console.log('venmo response', response)
+        })
+    }
+
     if (venmo.accessToken) {
         return $http({
           method: 'GET',
@@ -211,6 +227,7 @@ angular.module('ionicParseApp.services', [])
           venmo.userName = undefined;
         });
     }
+
 
     else venmo.isAuthenticated = false;
     return venmo;

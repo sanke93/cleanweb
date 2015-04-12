@@ -425,6 +425,8 @@ angular.module('ionicParseApp.controllers', [])
     $scope.data = {};
     $scope.totalPrice = 'Calculating price....'
     $scope.data.venmoUsername = '';
+    $scope.data.additionalCostAmount = '';
+    $scope.data.additionalCostBlurb = '';
     $scope.payerList = [];
     var Trip = Parse.Object.extend('Trip');
     var Cost = Parse.Object.extend('Cost');
@@ -434,7 +436,44 @@ angular.module('ionicParseApp.controllers', [])
     // tripQuery.exists("totalDist");
     // tripQuery.descending("updatedAt");
     $scope.trip = current.tripGet();
-        
+    $scope.costComponents = [];
+    
+    $scope.calculatePrice = function() {
+        $scope.totalPriceNum = 0;
+        for (index in $scope.costComponents) {
+            cc = $scope.costComponents[index];
+            $scope.totalPriceNum = Math.round(($scope.totalPriceNum + cc.attributes.amount)*100)/100;
+            $scope.totalPrice = $scope.totalPriceNum.toString();
+        }
+    }
+
+    $scope.getTotalPrice = function() {
+        var cCQuery = new Parse.Query(CostComponent);
+        cCQuery.equalTo("cost", $scope.cost)
+        cCQuery.find({
+        success: function(results) {
+            console.log('results', results);
+            $scope.costComponents = results;
+            $scope.calculatePrice();
+
+        }
+    })
+    }
+
+    $scope.createCC = function() {
+        var costComponent = new CostComponent();
+            costComponent.set('amount', parseFloat($scope.data.additionalCostAmount));
+            costComponent.set('blurb', $scope.data.additionalCostBlurb);
+            costComponent.set('cost', $scope.cost);
+            costComponent.save(null, {
+                success: function(cc) {
+                    console.log('cc', cc);
+                    $scope.getTotalPrice();
+                    $scope.data.additionalCostAmount = '';
+                    $scope.data.additionalCostBlurb = '';
+                }
+            })
+    }
             
     console.log('trip', $scope.trip);
     var totalDist = $scope.trip.get("totalDist");
@@ -451,13 +490,38 @@ angular.module('ionicParseApp.controllers', [])
                 $scope.fuelPrices = response;
                 var thisCarFuelPrice = $scope.fuelPrices[gasType];
                 var totalPriceNum = totalGallons * thisCarFuelPrice;
-                totalPriceNum = Math.round(totalPriceNum * 100) / 100
-                $scope.totalPrice = totalPriceNum.toString();
+
+                $scope.priceNum = Math.round(totalPriceNum * 100) / 100
+                $scope.gasUsedPrice = $scope.priceNum;
+                
+                var cost = new Cost();
+                cost.set('trip', $scope.trip);
+                cost.save(null, {
+                    success: function(cost) {
+                        console.log('cost', cost);
+                        $scope.cost = cost;
+                        var costComponent = new CostComponent();
+                        costComponent.set('amount', $scope.gasUsedPrice);
+                        costComponent.set('blurb', "fuel charge");
+                        costComponent.set('cost', $scope.cost);
+                        costComponent.save(null, {
+                            success: function(cc) {
+                                console.log('cc', cc);
+                                $scope.getTotalPrice();
+                            }
+                        })
+                      }
+                });
+
+
+
             })
         }
     })
             
-        
+    $scope.$watch('costComponents', function(val) {
+        console.log('ccS', val);
+    })
     
 
     var cost = new Cost();
@@ -485,9 +549,10 @@ angular.module('ionicParseApp.controllers', [])
         $scope.payerList.splice($index, 1);
     }
 
-    $scope.addPayer = function() {
+    $scope.addPayer = function(friend) {
         $scope.payerInstance = new venmoPayer();
-        $scope.payerInstance.set('venmoUsername', $scope.data.venmoUsername)
+        $scope.payerInstance.set('venmoUsername', friend.username)
+        $scope.payerInstance.set('venmoUserId', parseInt(friend.id, 10))
         $scope.payerList.push($scope.payerInstance);
     }
 
@@ -497,16 +562,18 @@ angular.module('ionicParseApp.controllers', [])
             payer = $scope.payerList[index];
             payer.save(null, {
                 success: function(payer) {
-                    console.log('payer', payer, $scope.rideCost);
+                    console.log('payer', payer, $scope.totalPriceNum);
                     var Payment = $scope.Parse.Object.extend('Payment')
                     var payment = new Payment();
-                    payment.set('amount', $scope.rideCost/($scope.payerList.length + 1))
-                    payment.set('paidTowards', cost);
-                    payment.set('paidTo', $scope.currentUserVenmoPayer);
+                    var a = $scope.totalPriceNum/($scope.payerList.length + 1)
+                    payment.set('amount', a)
+                    payment.set('paidTowards', $scope.cost);
+                    //payment.set('paidTo', $scope.currentUserVenmoPayer);
                     payment.set('paidBy', payer);
                     payment.save(null, {
                         success: function(payment) {
                             console.log('payment saved', payment);
+                            venmoAPIFactory.chargeUser(a, payer.venmoUserId);
                         }
                     })
                 }
