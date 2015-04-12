@@ -43,7 +43,7 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
-
+    $scope.date = new Date();
     var Car = Parse.Object.extend('Car');
     var query = new Parse.Query(Car);
     query.equalTo("user", Parse.User.current());
