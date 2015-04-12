@@ -12,10 +12,11 @@
         <div class="item">
           <div class="row">
             <div class="col-33">
-              <i class="icon ion-record rating assertive"></i>
+              <i class="icon rating" ng-class="{'assertive': mpg < 20, 'energized': mpg >= 20 && mpg <30, 'balanced': mpg >= 30, 'ion-record': mpg < 50, 'ion-leaf': mpg >= 50 }"></i>
             </div>
             <div class="col">
-              <h2>{{carInfo.make}} - {{carInfo.model}}</h2>
+              <h2>{{carInfo.make}}
+              <p>{{carInfo.model}}</p>
               <p>{{carInfo.year}}</p>
             </div>
           </div>
@@ -23,15 +24,17 @@
 
         <div class="item item-body">
           <p>
-            Avg MPG: {{carInfo.avgMPG}}
+            Avg MPG: {{mpg}}
           </p>
           <p>
             Fuel Type: {{carInfo.gasType}}
           </p>
         </div>
       </div>
-      <button class="button button-positive">
-        SELECT CAR
-      </button>
+      <div class="wrapper-center">
+        <button class="button button-positive" ng-click="selectCar()">
+          SELECT CAR
+        </button>
+      </div>
     </div>
 </div>

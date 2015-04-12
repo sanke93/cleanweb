@@ -474,7 +474,7 @@ angular.module('ionicParseApp.controllers', [])
                 }
             })
         }
-        
+
     }
 })
 
@@ -524,8 +524,13 @@ angular.module('ionicParseApp.controllers', [])
 
     $scope.updateCarStats = function() {
         $scope.carInfo = $scope.userCars.car.attributes;
-        console.log($scope.carInfo);
-        console.log($scope.carInfo.make);
+        var mpg = parseFloat($scope.carInfo.avgMPG);
+        $scope.mpg = mpg.toFixed(2);
+    };
+
+    $scope.selectCar = function() {
+        /*$scope.trip = $scope.userCars.car.id
+        $rootScope.showPopup.close();*/
     };
 })
 
@@ -613,7 +618,7 @@ angular.module('ionicParseApp.controllers', [])
                     success: function(car) {
                         console.log('car', car);
                     }
-                })
+                });
             });
           }
       };
