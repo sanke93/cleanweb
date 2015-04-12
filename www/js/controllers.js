@@ -108,7 +108,7 @@ angular.module('ionicParseApp.controllers', [])
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
-
+    $scope.tripControl = 'Start Trip';
     $scope.selectcar = function() {
       $rootScope.showCarPopup = $ionicPopup.show({
         scope: $scope,
@@ -124,57 +124,40 @@ angular.module('ionicParseApp.controllers', [])
     scope_trip = $scope;
     dist_track = distanceTracker;
     hi = current;
+    $scope.markers = [];
+
     initialize = function () {
-      
-      //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
-      $scope.startLocation = {}
-      $scope.loading1 = $ionicLoading.show({
-        content: 'Getting current location...',
-        //template: 'hi',
-        showBackdrop: true
-      });
-      navigator.geolocation.getCurrentPosition(function(pos) {
+        //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
+        $scope.startLocation = {}
+        $scope.loading1 = $ionicLoading.show({
+            content: 'Getting current location...',
+            //template: 'hi',
+            showBackdrop: true
+        });
+        navigator.geolocation.getCurrentPosition(function(pos) {
+                $scope.startLocation = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+                console.log("center", $scope.startLocation);
 
-        $scope.startLocation = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-        console.log("center", $scope.startLocation);
+                var mapOptions = {
+                  streetViewControl:true,
+                  center: $scope.startLocation,
+                  zoom: 18,
+                  streetViewControl: false,
+                  panControl: false,
+                  //zoomControl: false,
+                  mapTypeControl: false,
+                  styles: [{"featureType":"landscape.man_made","elementType":"geometry","stylers":[{"color":"#f7f1df"}]},{"featureType":"landscape.natural","elementType":"geometry","stylers":[{"color":"#d0e3b4"}]},{"featureType":"landscape.natural.terrain","elementType":"geometry","stylers":[{"visibility":"off"}]},{"featureType":"poi","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"poi.business","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"poi.medical","elementType":"geometry","stylers":[{"color":"#fbd3da"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#bde6ab"}]},{"featureType":"road","elementType":"geometry.stroke","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#ffe15f"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#efd151"}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#ffffff"}]},{"featureType":"road.local","elementType":"geometry.fill","stylers":[{"color":"black"}]},{"featureType":"transit.station.airport","elementType":"geometry.fill","stylers":[{"color":"#cfb2db"}]},{"featureType":"water","elementType":"geometry","stylers":[{"color":"#a2daf2"}]}],
+                };
+                var map = new google.maps.Map(document.getElementById("map"),
+                    mapOptions);
 
-        var mapOptions = {
-          streetViewControl:true,
-          center: $scope.startLocation,
-          zoom: 18,
-          streetViewControl: false,
-          panControl: false,
-          zoomControl: false,
-          mapTypeControl: false,
-        };
-        var map = new google.maps.Map(document.getElementById("map"),
-            mapOptions);
-
-        $scope.map = map;
-        $scope.geoMarker = new GeolocationMarker(map);
-        $ionicLoading.hide();
-      }, function(error) {
-        alert('Unable to get location: ' + error.message);
-      });
-      //var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
-      //var end = new google.maps.LatLng(55.8934378,-4.2201905);
-
-
-      // var directionsService = new google.maps.DirectionsService();
-      // var directionsDisplay = new google.maps.DirectionsRenderer();
-
-      // var request = {
-      //     origin : site,
-      //     destination : hospital,
-      //     travelMode : google.maps.TravelMode.DRIVING
-      // };
-      // directionsService.route(request, function(response, status) {
-      //     if (status == google.maps.DirectionsStatus.OK) {
-      //         directionsDisplay.setDirections(response);
-      //     }
-      // });
-
-      // directionsDisplay.setMap(map);
+                $scope.map = map;
+                $rootScope.map = $scope.map;
+                $scope.geoMarker = new GeolocationMarker(map);
+                $ionicLoading.hide();
+            }, function(error) {
+                alert('Unable to get location: ' + error.message);
+        });
     }
 
 
@@ -184,6 +167,9 @@ angular.module('ionicParseApp.controllers', [])
         //console.log("trip started", GeoMarker.position);
         
         $scope.tripStarted = true;
+        $scope.tripControl = 'End Trip';
+        document.getElementById('start-trip').style.visibility = 'hidden';
+        document.getElementById('end-trip').style.visibility = 'visible';
         var Trip = Parse.Object.extend('Trip');
         if(!$scope.map) {
           return;
@@ -191,49 +177,36 @@ angular.module('ionicParseApp.controllers', [])
         console.log("car selected");
         var trip = new Trip();
         console.log("car", $rootScope.currentSelectedCar);
+
         trip.set('driver', $scope.user);
-       // trip.set('startPoint', ($scope.tripStarted.k, $scope.tripStarted.D));
         trip.set('car', $rootScope.currentSelectedCar);
         trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
-        //trip.set('startPoint', (12,32));
         trip.save(null, {
             success: function(tripSaved) {
                 console.log('trip save', tripSaved);
                 $scope.currentTrip = tripSaved
             }
         })
+
         var infowindow = new google.maps.InfoWindow({
               content: 'Start'
           });
 
         var marker = new google.maps.Marker({
-          position: $scope.startLocation,
-          map: $scope.map,
-          title: 'Trip'
+            position: $scope.startLocation,
+            map: $scope.map,
+            title: 'Trip'
         });
         google.maps.event.addListener(marker, 'click', function() {
-        infowindow.open($scope.map,marker);
+            infowindow.open($scope.map,marker);
+        });
+        $scope.markers.push(marker);
+        $scope.loading = $ionicLoading.show({
+            content: 'Getting current location...',
+            //template: 'hi',
+            showBackdrop: true
         });
 
-        $scope.loading = $ionicLoading.show({
-          content: 'Getting current location...',
-          //template: 'hi',
-          showBackdrop: true
-        });
-        // navigator.geolocation.getCurrentPosition(function(pos) {
-        //   $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-        //   $scope.loading.hide();
-        // }, function(error) {
-        //   alert('Unable to get location: ' + error.message);
-        // });
-        // $scope.watch('GeoMarker', function(val){
-        //     if(!(typeof val.position === 'undefined')){
-        //         $scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
-        //         $scope.loading.hide();
-        //     }
-        // });
-        //$scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
-        //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
         distanceTracker.startWatcher()
         $ionicLoading.hide();
 
@@ -242,28 +215,39 @@ angular.module('ionicParseApp.controllers', [])
     $scope.endtrip = function(){
         console.log("end", $scope.geoMarker);
         distanceTracker.stopWatcher()
-       var alertPopup = $ionicPopup.alert({
-         title: 'Trip Details',
-         template: 'Total Distance: '+ distanceTracker.getDistance(),
-       });
-       alertPopup.then(function(res) {
-         console.log('Thank you for not eating my delicious ice cream cone');
-       });
+        var alertPopup = $ionicPopup.alert({
+            title: 'Trip Details',
+            template: 'Total Distance: '+ (distanceTracker.getDistance()).toFixed(2) + ' miles'+
+            '</br> Thanks for carpooling!',
+        });
+        alertPopup.then(function(res) {
+         console.log('popup closed');
+         $state.go('app.calculate');
+        });
 
 
         var infowindow = new google.maps.InfoWindow({
-              content: 'End Trip'
-          });
-
+            content: 'End Trip'
+        });
+        $scope.endLocation =  new google.maps.LatLng($scope.geoMarker.position.k, $scope.geoMarker.position.D);
+        //create end marker
         var marker = new google.maps.Marker({
-          position: new google.maps.LatLng($scope.geoMarker.position.k, $scope.geoMarker.position.D),
-          map: $scope.map,
-          title: 'Trip'
+            position:$scope.endLocation,
+            map: $scope.map,
+            title: 'Trip'
         });
         google.maps.event.addListener(marker, 'click', function() {
-        infowindow.open($scope.map,marker);
+            infowindow.open($scope.map,marker);
         });
-
+        $scope.markers.push(marker);
+        //set bounds and zoom to fit in the markers
+        var boundbox = new google.maps.LatLngBounds();
+        for ( var i = 0; i <$scope.markers.length; i++ ){
+            boundbox.extend(new google.maps.LatLng($scope.markers[i].position.k, $scope.markers[i].position.D));
+        }
+        $scope.map.setCenter(boundbox.getCenter());
+        $scope.map.fitBounds(boundbox);
+        //update Trip
         $scope.currentTrip.set('endPoint', new Parse.GeoPoint({latitude: $scope.geoMarker.position.k, longitude: $scope.geoMarker.position.D}));
         $scope.currentTrip.set('endedAt', new Date());
         //trip.set('startPoint', (12,32));
