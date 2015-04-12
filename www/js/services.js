@@ -143,4 +143,3 @@ angular.module('ionicParseApp.services', [])
 
     return tracker;
 });
->>>>>>> bb63e14bc76bcca7f6b9d24c6b9a0c1cc1f49b32
