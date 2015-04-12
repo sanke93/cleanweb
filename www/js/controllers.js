@@ -60,7 +60,7 @@ angular.module('ionicParseApp.controllers', [])
     scope_home = $scope;
 })
 
-.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup) {
+.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup, current) {
 
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
@@ -69,6 +69,7 @@ angular.module('ionicParseApp.controllers', [])
     console.log("Hi", $scope.user.attributes.email);
     scope_trip = $scope;
     dist_track = distanceTracker;
+    hi = current;
     initialize = function () {
       //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
       $scope.startLocation = {}
@@ -140,9 +141,9 @@ angular.module('ionicParseApp.controllers', [])
         trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
         //trip.set('startPoint', (12,32));
         trip.save(null, {
-            success: function(trip) {
-                console.log('trip', trip);
-                $scope.currentTrip = trip
+            success: function(tripSaved) {
+                console.log('trip save', tripSaved);
+                $scope.currentTrip = tripSaved
             }
         })
         var infowindow = new google.maps.InfoWindow({
@@ -211,9 +212,10 @@ angular.module('ionicParseApp.controllers', [])
         $scope.currentTrip.set('endedAt', new Date());
         //trip.set('startPoint', (12,32));
         $scope.currentTrip.save(null, {
-            success: function(trip) {
-                console.log('trip', trip.attributes.endpoint);
-                $scope.currentTrip = trip
+            success: function(tripSaved) {
+                console.log('trip saved', tripSaved);
+                $scope.currentTrip = tripSaved;
+                current.tripUpdate($scope.currentTrip);
             }
         })
 

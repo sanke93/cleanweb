@@ -134,12 +134,20 @@ angular.module('ionicParseApp.services', [])
       return distance;
     }
 
-      // return {
-      //     start: startWatcher,
-      //     stop: stopWatcher,
-      //     update: forceUpdate
-      // };
-    
 
     return tracker;
+})
+
+.factory('current', function($http) {
+    var current = {}
+    var trip = {}
+    current.tripUpdate = function(trip1){
+      console.log(trip1);
+      trip = trip1;
+    }
+    current.tripGet = function(){
+      return trip;
+    }
+    return current
+
 });
