@@ -90,7 +90,6 @@ angular.module('ionicParseApp.controllers', [])
             }
         })
         ref.addEventListener('exit', function(event) {
-
                 window.reload();
             }
         )
@@ -406,7 +405,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CostCreationController', function($scope, $state, $rootScope, venmoAPIFactory) {
+.controller('CostCreationController', function($scope, $state, $rootScope, venmoAPIFactory, fuelecoAPIservice) {
     //TODO: cost calculation
     $scope.venmo = venmoAPIFactory;
     if (venmoAPIFactory.isAuthenticated)
@@ -423,39 +422,64 @@ angular.module('ionicParseApp.controllers', [])
     })
     scope_cost = $scope;
     $scope.data = {};
-
-    $scope.rideCost = 10.00;
+    $scope.totalPrice = 'Calculating price....'
     $scope.data.venmoUsername = '';
     $scope.payerList = [];
     var Trip = Parse.Object.extend('Trip');
     var Cost = Parse.Object.extend('Cost');
     var CostComponent = Parse.Object.extend('CostComponent');
+    var Car = Parse.Object.extend('Car');
+    var tripQuery = new Parse.Query(Trip);
+    tripQuery.exists("totalDist");
+    tripQuery.descending("updatedAt");
 
-    var trip = new Trip();
-    trip.set('driver', $scope.user)
-    trip.save(null, {
-        success: function(trip) {
-            console.log('trip', trip);
+    tripQuery.first({
+        success:function(object) {
+            $scope.trip = object;
+            console.log('trip', object);
+            var totalDist = $scope.trip.get("totalDist");
+            var carId = $scope.trip.get("car").id;
+            var carQuery = new Parse.Query(Car);
+            carQuery.get(carId, {
+                success: function(car) {
+                    $scope.car = car;
+                    var avgMPG = parseFloat($scope.car.get('avgMPG'))
+                    var totalGallons = totalDist/avgMPG;
+                    var gasType = $scope.car.get("gasType");
+                    fuelecoAPIservice.getFuelPrices().success(function(response) {
+                        console.log('response', response);
+                        $scope.fuelPrices = response;
+                        var thisCarFuelPrice = $scope.fuelPrices[gasType];
+                        var totalPriceNum = totalGallons * thisCarFuelPrice;
+                        totalPriceNum = Math.round(totalPriceNum * 100) / 100
+                        $scope.totalPrice = totalPriceNum.toString();
+                    })
+                }
+            })
+            
         }
     })
 
     var cost = new Cost();
-    cost.set('trip', trip)
+    cost.set('trip', $scope.trip)
     cost.save(null, {
-        success: function(trip) {
+        success: function(cost) {
             console.log('cost', cost);
+            $scope.cost = cost;
         }
     })
 
-    var costcomponent = new CostComponent();
-    costcomponent.set('cost', cost)
-    costcomponent.set('amount', 10)
-    costcomponent.set('blurb', 'test')
-    costcomponent.save(null, {
-        success: function(trip) {
-            console.log('costcomponent', costcomponent);
-        }
-    })
+
+
+    // var costcomponent = new CostComponent();
+    // costcomponent.set('cost', cost)
+    // costcomponent.set('amount', )
+    // costcomponent.set('blurb', 'test')
+    // costcomponent.save(null, {
+    //     success: function(trip) {
+    //         console.log('costcomponent', costcomponent);
+    //     }
+    // })
 
     $scope.removePayer = function(payerInstance, $index) {
         $scope.payerList.splice($index, 1);
@@ -633,7 +657,7 @@ angular.module('ionicParseApp.controllers', [])
 
             fuelecoAPIservice.getVehicleInfo($scope.carData.carEngine.value).success(function (response) {
                 console.log("Vehicle Info Service: succeeded.");
-                $scope.gasType = response.fuelType;
+                $scope.gasType = response.fuelType1.split(' Gasoline')[0].toLowerCase();
                 if ($scope.avgMPG == undefined)
                 {
                   $scope.avgMPG = (parseFloat(response.UCity) + parseFloat(response.UHighway))/2.0;
