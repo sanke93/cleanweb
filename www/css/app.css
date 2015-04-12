@@ -28,6 +28,10 @@
   text-align: center;
 }
 
+.small-card {
+  font-size: 14px;
+}
+
 .popup-show {
   height: 350px;
 }
@@ -52,3 +56,4 @@
 .home-screen{
   padding-top: 30px;
 }
+
