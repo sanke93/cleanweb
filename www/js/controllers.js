@@ -10,6 +10,7 @@ angular.module('ionicParseApp.controllers', [])
         Parse.User.logOut();
         $rootScope.user = null;
         $rootScope.isLoggedIn = false;
+
         $state.go('welcome', {
             clear: true
         });
@@ -17,6 +18,9 @@ angular.module('ionicParseApp.controllers', [])
 })
 
 .controller('WelcomeController', function($scope, $state, $rootScope, $ionicHistory, $stateParams) {
+
+    $rootScope.hasCar = false;
+    
     if ($stateParams.clear) {
         $ionicHistory.clearHistory();
         $ionicHistory.clearCache();
@@ -36,10 +40,23 @@ angular.module('ionicParseApp.controllers', [])
 })
 
 .controller('HomeController', function($scope, $state, $rootScope, $window) {
-
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
+
+    var Car = Parse.Object.extend('Car');
+    var query = new Parse.Query(Car);
+    query.equalTo("user", Parse.User.current());
+    query.count({
+      success: function(number) {
+        if (number > 0)
+          $rootScope.hasCar = true;
+      },
+      error: function(error) {
+        alert("Error: " + error.code + " " + error.message);
+      }
+    });
+
     scope_home = $scope;
 
     $scope.venmoRedirect = function() {
@@ -48,7 +65,7 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading) {
+.controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup) {
 
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
@@ -56,25 +73,41 @@ angular.module('ionicParseApp.controllers', [])
 
     console.log("Hi", $scope.user.attributes.email);
     scope_trip = $scope;
+    dist_track = distanceTracker;
     initialize = function () {
       //var startlocation = new google.maps.LatLng(55.9879314,-4.3042387);
-      var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
+      $scope.startLocation = {}
+      $scope.loading1 = $ionicLoading.show({
+        content: 'Getting current location...',
+        //template: 'hi',
+        showBackdrop: true
+      });
+      navigator.geolocation.getCurrentPosition(function(pos) {
+
+        $scope.startLocation = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
+        console.log("center", $scope.startLocation);
+
+        var mapOptions = {
+          streetViewControl:true,
+          center: $scope.startLocation,
+          zoom: 18,
+          streetViewControl: false,
+          panControl: false,
+          zoomControl: false,
+          mapTypeControl: false,
+        };
+        var map = new google.maps.Map(document.getElementById("map"),
+            mapOptions);
+
+        $scope.map = map;
+        $scope.geoMarker = new GeolocationMarker(map);
+        $ionicLoading.hide();
+      }, function(error) {
+        alert('Unable to get location: ' + error.message);
+      });
+      //var startLocation = new google.maps.LatLng(42.3503446, -71.0571948)
       //var end = new google.maps.LatLng(55.8934378,-4.2201905);
 
-      var mapOptions = {
-        streetViewControl:true,
-        center: startLocation,
-        zoom: 18,
-        //mapTypeId: google.maps.MapTypeId.TERRAIN
-      };
-      var map = new google.maps.Map(document.getElementById("map"),
-          mapOptions);
-
-      //Marker + infowindow + angularjs compiled ng-click
-      
-
-      $scope.map = map;
-      var GeoMarker = new GeolocationMarker(map);
 
       // var directionsService = new google.maps.DirectionsService();
       // var directionsDisplay = new google.maps.DirectionsRenderer();
@@ -96,27 +129,105 @@ angular.module('ionicParseApp.controllers', [])
 
     google.maps.event.addDomListener(window, 'load', initialize());
 
-    $scope.centerOnMe = function() {
+
+    $scope.starttrip = function() {
+        //console.log("trip started", GeoMarker.position);
+        $scope.tripStarted = true;
+        var Trip = Parse.Object.extend('Trip');
         if(!$scope.map) {
           return;
         }
 
+        var trip = new Trip();
+        trip.set('driver', $scope.user);
+       // trip.set('startPoint', ($scope.tripStarted.k, $scope.tripStarted.D));
+
+        trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
+        //trip.set('startPoint', (12,32));
+        trip.save(null, {
+            success: function(trip) {
+                console.log('trip', trip);
+                $scope.currentTrip = trip
+            }
+        })
+        var infowindow = new google.maps.InfoWindow({
+              content: 'Start'
+          });
+
+        var marker = new google.maps.Marker({
+          position: $scope.startLocation,
+          map: $scope.map,
+          title: 'Trip'
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open($scope.map,marker);
+        });
+
         $scope.loading = $ionicLoading.show({
           content: 'Getting current location...',
-          template: 'hi',
+          //template: 'hi',
           showBackdrop: true
         });
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-          $scope.loading.hide();
-        }, function(error) {
-          alert('Unable to get location: ' + error.message);
-        });
+        // navigator.geolocation.getCurrentPosition(function(pos) {
+        //   $scope.map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+        //   $scope.loading.hide();
+        // }, function(error) {
+        //   alert('Unable to get location: ' + error.message);
+        // });
+        // $scope.watch('GeoMarker', function(val){
+        //     if(!(typeof val.position === 'undefined')){
+        //         $scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
+        //         $scope.loading.hide();
+        //     }
+        // });
+        //$scope.map.setCenter(new google.maps.LatLng(GeoMarker.position.k, GeoMarker.position.D));
+        //$scope.map.setCenter(new google.maps.LatLng(42.3503446, -71.0571948));
+        distanceTracker.startWatcher()
+        $ionicLoading.hide();
+
     };
 
-    $scope.clickTest = function() {
-    alert('Example of infowindow with ng-click')
-    };
+    $scope.endtrip = function(){
+        console.log("end", $scope.geoMarker);
+        distanceTracker.stopWatcher()
+           var alertPopup = $ionicPopup.alert({
+             title: 'Trip Details',
+             template: 'Total Distance: '+ distanceTracker.getDistance(),
+           });
+           alertPopup.then(function(res) {
+             console.log('Thank you for not eating my delicious ice cream cone');
+           });
+
+
+        var infowindow = new google.maps.InfoWindow({
+              content: 'End Trip'
+          });
+
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng($scope.geoMarker.position.k, $scope.geoMarker.position.D),
+          map: $scope.map,
+          title: 'Trip'
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open($scope.map,marker);
+        });
+
+        $scope.currentTrip.set('endPoint', new Parse.GeoPoint({latitude: $scope.geoMarker.position.k, longitude: $scope.geoMarker.position.D}));
+        $scope.currentTrip.set('endedAt', new Date());
+        //trip.set('startPoint', (12,32));
+        $scope.currentTrip.save(null, {
+            success: function(trip) {
+                console.log('trip', trip.attributes.endpoint);
+                $scope.currentTrip = trip
+            }
+        })
+
+
+    }
+
+    // $scope.clickTest = function() {
+    // alert('Example of infowindow with ng-click')
+    // };
 })
 
 .controller('EndTripController', function($scope, $state, $rootScope) {
@@ -312,7 +423,7 @@ angular.module('ionicParseApp.controllers', [])
     $scope.removePayer = function(payerInstance, $index) {
         $scope.payerList.splice($index, 1);
     }
-    
+
     $scope.addPayer = function() {
         $scope.payerInstance = new venmoPayer();
         $scope.payerInstance.set('venmoUsername', $scope.data.venmoUsername)
@@ -372,17 +483,91 @@ angular.module('ionicParseApp.controllers', [])
 })
 
 .controller('CarController', function($scope, fuelecoAPIservice) {
-    $scope.colors = [
-      {name:'black', shade:'dark'},
-      {name:'white', shade:'light', notAnOption: true},
-      {name:'red', shade:'dark'},
-      {name:'blue', shade:'dark', notAnOption: true},
-      {name:'yellow', shade:'light', notAnOption: false}
-    ];
+    $scope.carData = {};
 
-    $scope.yearsList = [];
-    $scope.msg = "failed :(";
+    //Helper Functions
+    $scope.reset = function(setYear, setMake, setModel, setEngine) {
+        if (setYear)
+          $scope.carData.carYear = '';
+        if (setMake)
+          $scope.carData.carMake = '';
+        if (setModel)
+          $scope.carData.carModel = '';
+        if (setEngine)
+          $scope.carData.carEngine = '';
+    }
+
+    $scope.listify = function(obj, value) {
+        if (obj == undefined)
+          return [value];
+        return value;
+    };
+    //End Helpers
+
+    $scope.reset(true, true, true, true);
+
     fuelecoAPIservice.getYears().success(function (response) {
-        $scope.msg = "succeeded! :D";
+        console.log("Year Service: succeeded.");
+        $scope.years = response.menuItem;
+        $scope.reset(false, true, true, true);
     });
+
+    $scope.updateMake = function() {
+        fuelecoAPIservice.getMakes($scope.carData.carYear.value).success(function (response) {
+            console.log("Make Service: succeeded.");
+            $scope.makes = $scope.listify(response.menuItem.length, response.menuItem);
+            $scope.reset(false, false, true, true);
+        });
+    };
+
+    $scope.updateModel = function() {
+        fuelecoAPIservice.getModels($scope.carData.carYear.value, $scope.carData.carMake.value).success(function (response) {
+            console.log("Model Service: succeeded.");
+            $scope.models = $scope.listify(response.menuItem.length, response.menuItem);
+            $scope.reset(false, false, false, true);
+        });
+    };
+
+    $scope.updateEngine = function() {
+        fuelecoAPIservice.getVehicles($scope.carData.carYear.value, $scope.carData.carMake.value, $scope.carData.carModel.value).success(function (response) {
+            console.log("Vehicle Service: succeeded.");
+            $scope.vehicles = $scope.listify(response.menuItem.length, response.menuItem);
+        });
+    };
+
+    $scope.addCar = function() {
+      if ($scope.carData.carEngine.value != undefined &&
+          $scope.carData.carEngine.value != "") {
+            var Car = Parse.Object.extend('Car');
+            var car = new Car();
+
+            fuelecoAPIservice.getVehicleMPG($scope.carData.carEngine.value).success(function (response) {
+                console.log("Vehicle MPG Service: succeeded.");
+                $scope.avgMPG = response.avgMpg;
+            });
+
+            fuelecoAPIservice.getVehicleInfo($scope.carData.carEngine.value).success(function (response) {
+                console.log("Vehicle Info Service: succeeded.");
+                $scope.gasType = response.fuelType;
+                if ($scope.avgMPG == undefined)
+                {
+                  $scope.avgMPG = (parseFloat(response.UCity) + parseFloat(response.UHighway))/2.0;
+                }
+
+                car.set('user', $scope.user);
+                car.set('dbId', $scope.carData.carEngine.value);
+                car.set('avgMPG', $scope.avgMPG.toString());
+                car.set('gasType', $scope.gasType);
+                car.set('make', $scope.carData.carMake.value);
+                car.set('model', $scope.carData.carModel.value);
+                car.set('year', parseInt($scope.carData.carYear.value));
+
+                car.save(null, {
+                    success: function(car) {
+                        console.log('car', car);
+                    }
+                })
+            });
+          }
+      };
 });
