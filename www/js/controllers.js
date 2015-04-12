@@ -410,6 +410,9 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CostCreationController', function($scope, $state, $rootScope, venmoAPIFactory) {
     //TODO: cost calculation
+    $scope.venmo = venmoAPIFactory;
+    if (venmoAPIFactory.isAuthenticated)
+        data = venmoAPIFactory.getFriends();
     $scope.Parse = Parse;
     var venmoPayer = Parse.Object.extend('venmoPayer')
     var venmoPayerQuery = new Parse.Query(venmoPayer)
@@ -420,7 +423,7 @@ angular.module('ionicParseApp.controllers', [])
             $scope.currentUserVenmoPayer = results[0];
         }
     })
-    blahblah = $scope;
+    scope_cost = $scope;
     $scope.data = {};
 
     $scope.rideCost = 10.00;
@@ -487,8 +490,24 @@ angular.module('ionicParseApp.controllers', [])
                 }
             })
         }
-
     }
+
+    $scope.$watch('venmo.friends', function(val) {
+        $scope.friends = val;
+    })
+
+    $scope.$watch('data.venmoUsername', function(val) {
+        if (val) {
+            $scope.friends = venmoAPIFactory.friends.filter(function(friend) {
+                            return (friend.first_name.indexOf(val) > -1) || 
+                                    (friend.last_name.indexOf(val) > -1)
+            })
+        }
+        else {
+            $scope.friends = venmoAPIFactory.friends;
+            console.log('herere',$scope.friends)
+        }
+    })
 })
 
 .controller('MainController', function($scope, $state, $rootScope, $stateParams, $ionicHistory) {

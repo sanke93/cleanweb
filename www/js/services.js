@@ -163,8 +163,9 @@ angular.module('ionicParseApp.services', [])
     venmo.getFriends = function() {
         return $http({
           method: 'GET',
-          url: "https://api.venmo.com/v1/users/"+venmo.userId+"/friends?access_token="+venmo.getAccessToken()
+          url: "https://api.venmo.com/v1/users/"+venmo.userId+"/friends?access_token="+venmo.getAccessToken()+"&limit=25"
         }).success(function(response) {
+          venmo.friends = response.data;
           return response.data;
         })
     }
@@ -195,6 +196,7 @@ angular.module('ionicParseApp.services', [])
           venmo.isAuthenticated = true;
           venmo.userName = response.data.user.username;
         }).error(function(err) {
+
           venmo.isAuthenticated = false;
           venmo.userName = undefined;
         });

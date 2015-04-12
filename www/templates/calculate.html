@@ -8,14 +8,21 @@
         </div>
         
         <div class="row">
-            <div class="col col-80">
+            <div class="col">
                 <label class="item item-input">
                     <input type="text" ng-model="data.venmoUsername" placeholder="Venmo username"/>
                 </label>
             </div>
-            <div class="col">
-                <button ng-show="data.venmoUsername" ng-click="addPayer()" class="button button-positive">Add</button>
-            </div>
+        </div>
+
+        <div class="row">
+            <ul class="list">
+                    <li class="item" ng-repeat="friend in friends track by $index">
+                        <div class="row">
+                            {{friend.display_name}}
+                        </div>
+                    </li>
+                </ul>
         </div>
 
         <div class="row">
@@ -34,6 +41,7 @@
                 </ul>
             </div>
         </div>
+
 
         <div class="row">
             <button class="button button-full button-balanced" ng-show="payerList.length" ng-click="createPayments()">
