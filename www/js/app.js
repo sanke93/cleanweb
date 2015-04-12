@@ -117,7 +117,7 @@ angular.module('ionicParseApp',
         var currentUser = Parse.User.current();
         $rootScope.user = null;
         $rootScope.isLoggedIn = false;
-
+        $rootScope.CLIENT_ID = 2532;
         if (currentUser) {
             $rootScope.user = currentUser;
             $rootScope.isLoggedIn = true;

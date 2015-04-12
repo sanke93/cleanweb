@@ -1,7 +1,12 @@
 <ion-view title="Carpooler" right-buttons="rightButtons" hide-back-button="true">
     <ion-content has-header="true" has-tabs="true" padding="true">
         Welcome {{user.attributes.email}}
-        <button class="button button-balanced button-full " ui-sref="app.addtrip" ng-hide="!hasCar">ADD TRIP</button>
-        <button class="button button-balanced button-full " ui-sref="app.car">ADD CAR</button>
+
+        <button class="button button-full" ng-click="venmoRedirect()"> Add Venmo</button>
+
+        <button class="button button-balanced button-full " ui-sref="app.addtrip" ng-hide="!hasCar">Add Trip</button>
+
+        <button class="button button-balanced button-full " ui-sref="app.car">Add Car</button>
+    
     </ion-content>
 </ion-view>

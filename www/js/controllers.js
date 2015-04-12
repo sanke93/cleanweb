@@ -39,7 +39,7 @@ angular.module('ionicParseApp.controllers', [])
     }
 })
 
-.controller('HomeController', function($scope, $state, $rootScope) {
+.controller('HomeController', function($scope, $state, $rootScope, $window) {
     if (!$rootScope.isLoggedIn) {
         $state.go('welcome');
     }
@@ -58,6 +58,11 @@ angular.module('ionicParseApp.controllers', [])
     });
 
     scope_home = $scope;
+
+    $scope.venmoRedirect = function() {
+        $window.location = "https://api.venmo.com/v1/oauth/authorize?client_id=2532&scope=make_payments%20access_friends"
+
+    }
 })
 
 .controller('TripController', function($scope, $state, $rootScope, $compile, $ionicLoading, distanceTracker, $ionicPopup, current) {
@@ -371,11 +376,19 @@ angular.module('ionicParseApp.controllers', [])
 
 .controller('CostCreationController', function($scope, $state, $rootScope) {
     //TODO: cost calculation
+    $scope.Parse = Parse;
     var venmoPayer = Parse.Object.extend('venmoPayer')
+    var venmoPayerQuery = new Parse.Query(venmoPayer)
+    venmoPayerQuery.equalTo("user", $scope.user);
+    venmoPayerQuery.find({
+        success: function(results) {
+            console.log('results', results);
+            $scope.currentUserVenmoPayer = results[0];
+        }
+    })
     blahblah = $scope;
     $scope.data = {};
 
-    console.log('tetst');
     $scope.rideCost = 10.00;
     $scope.data.venmoUsername = '';
     $scope.payerList = [];
@@ -419,12 +432,28 @@ angular.module('ionicParseApp.controllers', [])
         $scope.payerList.push($scope.payerInstance);
     }
 
+
     $scope.createPayments = function() {
-        var Payment = Parse.objects.extend('Payment')
-        var payment = new Payment();
-        payment.set('amount', $scope.rideCost/($scope.payerList.length + 1))
-        payment.set('cost', cost);
-        payment.set('')
+        for (index in $scope.payerList) {
+            payer = $scope.payerList[index];
+            payer.save(null, {
+                success: function(payer) {
+                    console.log('payer', payer, $scope.rideCost);
+                    var Payment = $scope.Parse.Object.extend('Payment')
+                    var payment = new Payment();
+                    payment.set('amount', $scope.rideCost/($scope.payerList.length + 1))
+                    payment.set('paidTowards', cost);
+                    payment.set('paidTo', $scope.currentUserVenmoPayer);
+                    payment.set('paidBy', payer);
+                    payment.save(null, {
+                        success: function(payment) {
+                            console.log('payment saved', payment);
+                        }
+                    })
+                }
+            })
+        }
+        
     }
 })
 
