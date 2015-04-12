@@ -93,8 +93,18 @@ angular.module('ionicParseApp.services', [])
         var lastPos = coords[coords.length-1];
         if(lastPos) {
             distance += tracker.calculateDistance(lastPos, position.coords);
-            console.log("distance", distance, position.coords);
-            $rootScope.map.panTo(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+            console.log("distance", distance, position.coords, lastPos);
+            var currentLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+            $rootScope.map.panTo(currentLatLng);
+            var path = new google.maps.Polyline({
+                path: [new google.maps.LatLng(lastPos.latitude, lastPos.longitude), currentLatLng],
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+              });
+
+              path.setMap($rootScope.map);
             //$rootScope.map.panTo(55.9879314,-4.3042387);
         }
 
