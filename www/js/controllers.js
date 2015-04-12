@@ -202,10 +202,12 @@ angular.module('ionicParseApp.controllers', [])
         distanceTracker.stopWatcher()
         var alertPopup = $ionicPopup.alert({
             title: 'Trip Details',
-            template: 'Total Distance: '+ distanceTracker.getDistance(),
+            template: 'Total Distance: '+ (distanceTracker.getDistance()).toFixed(2) + ' miles'+
+            '</br> Thanks for carpooling!',
         });
         alertPopup.then(function(res) {
-         console.log('Thank you for not eating my delicious ice cream cone');
+         console.log('popup closed');
+         $state.go('app.calculate');
         });
 
 
