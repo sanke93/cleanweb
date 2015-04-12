@@ -73,14 +73,14 @@ angular.module('ionicParseApp.controllers', [])
                 console.log('user saved');
             }})
         });
-       
+
         // venmoAPIFactory.storeVenmoUsername();
     }
 
     $scope.venmoRedirect = function() {
         console.log('test')
         var ref = window.open(venmoAPIFactory.getUrl(), '_blank', 'location=no')
-        ref.addEventListener('loadstart', function(event) { 
+        ref.addEventListener('loadstart', function(event) {
             if((event.url).startsWith("http://localhost:8100")) {
                 var string = "?access_token="
                 var accessToken = event.url.split(string)[1].split("#")[0];
@@ -89,8 +89,8 @@ angular.module('ionicParseApp.controllers', [])
                 window.reload();
             }
         })
-        ref.addEventListener('exit', function(event) { 
-            
+        ref.addEventListener('exit', function(event) {
+
                 window.reload();
             }
         )
@@ -165,7 +165,7 @@ angular.module('ionicParseApp.controllers', [])
 
     $scope.starttrip = function() {
         //console.log("trip started", GeoMarker.position);
-        
+
         $scope.tripStarted = true;
         $scope.tripControl = 'End Trip';
         document.getElementById('start-trip').style.visibility = 'hidden';
@@ -497,7 +497,7 @@ angular.module('ionicParseApp.controllers', [])
     $scope.$watch('data.venmoUsername', function(val) {
         if (val) {
             $scope.friends = venmoAPIFactory.friends.filter(function(friend) {
-                            return (friend.first_name.indexOf(val) > -1) || 
+                            return (friend.first_name.indexOf(val) > -1) ||
                                     (friend.last_name.indexOf(val) > -1)
             })
         }
@@ -567,7 +567,7 @@ angular.module('ionicParseApp.controllers', [])
     };
 })
 
-.controller('CarController', function($scope, fuelecoAPIservice) {
+.controller('CarController', function($scope, $ionicPopup, fuelecoAPIservice) {
     $scope.carData = {};
 
     //Helper Functions
@@ -650,6 +650,13 @@ angular.module('ionicParseApp.controllers', [])
                 car.save(null, {
                     success: function(car) {
                         console.log('car', car);
+                        console.log('hello');
+                        var alertPopup = $ionicPopup.alert({
+                            title: 'Your car was successfully added!',
+                        });
+                        alertPopup.then(function(res) {
+                          console.log('popup closed');
+                        });
                     }
                 });
             });
