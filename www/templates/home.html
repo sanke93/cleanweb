@@ -1,16 +1,45 @@
-i<ion-view right-buttons="rightButtons" hide-back-button="true">
+<ion-view right-buttons="rightButtons" hide-back-button="true" >
 	<ion-nav-title>
 	      <img src="img/logo.png" style="width:70%">
 	</ion-nav-title>
-    <ion-content has-header="true" has-tabs="true" padding="true">
-        Welcome {{user.attributes.email}}
+    <ion-content has-header="true" has-tabs="true" padding="true" scroll="false" class="home-screen">
+       <!--  <p style="padding-left:10px">Welcome!</p> -->
+       <h3 style="text-align:center">Welcome!</h3>
+       <br/>
+        <div class="list card" style="margin: 0 10px 0 10px;margin-bottom:40px">
 
-        <button class="button button-full" ng-click="venmoRedirect()" ng-hide='checkAuth()'> Add Venmo</button>
+	          <div class="item ">
 
-        <!-- <button class="button button-balanced button-full " ui-sref="app.addtrip" ng-hide="!hasCar">Add Trip</button> -->
-        <button class="button button-balanced button-full " ui-sref="app.addtrip" >Add Trip</button>
-        <button class="button button-balanced button-full " ui-sref="app.car" >Add Car</button>
-        <button class="button button-balanced button-full " ui-sref="app.calculate" >Calc</button>
-    
+	            <h2>Your last trip</h2>
+	            <p>{{date | date: 'medium'}}</p>
+	          </div>
+
+	          <div class="item item-body">
+	            <p>
+	              
+	            </p>
+	          </div>
+
+	          <div class="item tabs tabs-secondary tabs-icon-left">
+
+	            <a class="tab-item" href="#">
+	              <i class="icon ion-chatbox"></i>
+	              Add note
+	            </a>
+	            <a class="tab-item" href="#">
+	              <i class="icon ion-share"></i>
+	              Share
+	            </a>
+	          </div>
+	    </div>
+        <div>
+	        <button class="button button-full" ng-click="venmoRedirect()" ng-hide='checkAuth()'> Add Venmo</button>
+
+	        <!-- <button class="button button-balanced button-full " ui-sref="app.addtrip" ng-hide="!hasCar">Add Trip</button> -->
+	        <button class="button button-balanced button-full button-large " ui-sref="app.addtrip" >Add Trip</button>
+	        <button class="button button-balanced button-full button-large " ui-sref="app.car" >Add Car</button>
+	        <button class="button button-balanced button-full " ui-sref="app.calculate" >Calc</button>
+        </div>
+    	<!-- <img src='img/carpool.png' style="z-index:-10; width:100%"/> -->
     </ion-content>
 </ion-view>
