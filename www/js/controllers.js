@@ -523,18 +523,11 @@ angular.module('ionicParseApp.controllers', [])
             })
         }
     })
-<<<<<<< HEAD
             
     $scope.$watch('costComponents', function(val) {
         console.log('ccS', val);
     })
     
-=======
-
-
-
->>>>>>> 50cb0f3c2fb7fc908ca3bd0b8e3aa67eb0ecf10b
-
     var cost = new Cost();
     cost.set('trip', $scope.trip)
     cost.save(null, {
