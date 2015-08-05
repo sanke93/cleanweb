@@ -175,22 +175,26 @@ angular.module('ionicParseApp.controllers', [])
         document.getElementById('start-trip').style.visibility = 'hidden';
         document.getElementById('end-trip').style.visibility = 'visible';
         var Trip = Parse.Object.extend('Trip');
+
         if(!$scope.map) {
           return;
         }
-        console.log("car selected");
+        console.log("car selected", $scope.startLocation);
         var trip = new Trip();
         console.log("car", $rootScope.currentSelectedCar);
 
         trip.set('driver', $scope.user);
         trip.set('car', $rootScope.currentSelectedCar);
-        trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.k, longitude: $scope.startLocation.D}));
+        trip.set('startPoint', new Parse.GeoPoint({latitude: $scope.startLocation.lat(), longitude: $scope.startLocation.lng()}));
+
         trip.save(null, {
             success: function(tripSaved) {
                 console.log('trip save', tripSaved);
                 $scope.currentTrip = tripSaved
             }
         })
+
+        console.log("trip1", trip, $scope.currentTrip)
 
         var infowindow = new google.maps.InfoWindow({
               content: 'Start'
@@ -219,6 +223,18 @@ angular.module('ionicParseApp.controllers', [])
     $scope.endtrip = function(){
         console.log("end", $scope.geoMarker);
         distanceTracker.stopWatcher()
+        //update Trip
+        $scope.currentTrip.set('endPoint', new Parse.GeoPoint({latitude: $scope.geoMarker.position.lat(), longitude: $scope.geoMarker.position.lng()}));
+        $scope.currentTrip.set('endedAt', new Date());
+        $scope.currentTrip.set('totalDist', parseInt((distanceTracker.getDistance()).toFixed(2)));
+        //trip.set('startPoint', (12,32));
+        $scope.currentTrip.save(null, {
+            success: function(tripSaved) {
+                console.log('trip saved', tripSaved);
+                $scope.currentTrip = tripSaved;
+                current.tripUpdate($scope.currentTrip);
+            }
+        })
         var alertPopup = $ionicPopup.alert({
             title: 'Trip Details',
             template: 'Total Distance: '+ (distanceTracker.getDistance()).toFixed(2) + ' miles'+
@@ -251,18 +267,7 @@ angular.module('ionicParseApp.controllers', [])
         }
         $scope.map.setCenter(boundbox.getCenter());
         $scope.map.fitBounds(boundbox);
-        //update Trip
-        $scope.currentTrip.set('endPoint', new Parse.GeoPoint({latitude: $scope.geoMarker.position.k, longitude: $scope.geoMarker.position.D}));
-        $scope.currentTrip.set('endedAt', new Date());
-        $scope.currentTrip.set('totalDist', parseInt((distanceTracker.getDistance()).toFixed(2)));
-        //trip.set('startPoint', (12,32));
-        $scope.currentTrip.save(null, {
-            success: function(tripSaved) {
-                console.log('trip saved', tripSaved);
-                $scope.currentTrip = tripSaved;
-                current.tripUpdate($scope.currentTrip);
-            }
-        })
+        
 
 
     }
